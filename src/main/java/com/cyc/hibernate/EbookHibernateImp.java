@@ -31,6 +31,7 @@ public  class EbookHibernateImp extends BaseHibernateDAOImp<EbookDomain> impleme
 			hql+= " and "+colum+"="+params;
 			
 		}
+		 
 		
 		List<EbookDomain> domains = session.createQuery(hql).list();
 		

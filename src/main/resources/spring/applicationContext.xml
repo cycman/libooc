@@ -11,7 +11,7 @@
 
 	
 	<!-- 引入配置文件 -->
-    <context:property-placeholder location="classpath:config.properties" />
+    <context:property-placeholder location="classpath:hibernate/config.properties" />
       
 
 </beans>

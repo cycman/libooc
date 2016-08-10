@@ -38,8 +38,7 @@ public class IndexSeacherCtl {
 	  private ControlLog controllog =new ControlLog(this.getClass());
 	  private IndexSearchSer seacher= new IndexSearchSer();
 	  
-	  @Autowired
-	  EbookHibernateImp hibernateImp;
+	   
 	 
 	 
 	@RequestMapping(value="/default",produces="text/html;charset=gbk")  
@@ -57,9 +56,7 @@ public class IndexSeacherCtl {
          view.setNextPageUrl(PAGEURL+"default?"+"search="+search+"&page="+(Integer.valueOf(page)+1)+"&pagesize="+Integer.valueOf(pagesize)+1);
          view.setPrviousPageUrl(PAGEURL+"default?"+"search="+search+"&page="+(Integer.valueOf(page)-1)+"&pagesize="+Integer.valueOf(pagesize)+1);
          view.setMaxIndexs(IndexSearchSer.INDEXNUMMAP.get(search));
-		 EbookHibernateImp ebookHibernateImp= new EbookHibernateImp();
-		 
-		 EbookDomain ebookDomain=ebookHibernateImp .findByColum("eb_ID", "27002");
+ 		 
          return  JSON.toJSONString(view);
 	}
 

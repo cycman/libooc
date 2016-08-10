@@ -13,6 +13,8 @@ import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.*;
 import org.apache.lucene.util.Version;
 
+import com.cyc.config.ConfigManage;
+
 import java.io.IOException;
 import java.text.BreakIterator;
 import java.util.List;
@@ -286,6 +288,7 @@ public class SearchUtil extends BaseUtil {
 	 * @throws Exception
 	 * @return 返回查询到的记录数
 	 */
+    private static String MAX_INDEX_NUM="maxindex";
 	public static int multiFieldQuery(String[] fileds, String search,
 			List<Document> docs, String page, String pagesize) throws Exception {
         try {
@@ -303,7 +306,7 @@ public class SearchUtil extends BaseUtil {
 
             // 查询
             
-            TopDocs topDocs = searcher.search(query, 10000);
+            TopDocs topDocs = searcher.search(query, Integer.valueOf(ConfigManage.GLOBAL_STRING_CONFIG.get(MAX_INDEX_NUM)));
 
             ScoreDoc[] scoreDocs = topDocs.scoreDocs;
             logger.info("查询到条数=" + scoreDocs.length);

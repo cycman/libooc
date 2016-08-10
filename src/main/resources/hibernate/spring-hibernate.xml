@@ -72,13 +72,13 @@ http://www.springframework.org/schema/context/spring-context-3.1.xsd"
 			</props>
 		</property>
 
-		<!-- 自动扫描注解方式配置的hibernate类文件
+		<!-- 自动扫描注解方式配置的hibernate类文件 -->
 		<property name="packagesToScan">
 			<list>
-				<value>com.jesus.sshframework.model</value>
+				<value>com.cyc.domain</value>
 			</list>
 		</property>
-		 -->
+		
 	</bean>
 
 	 
@@ -104,8 +104,8 @@ http://www.springframework.org/schema/context/spring-context-3.1.xsd"
 			<tx:method name="repair" />
 			<tx:method name="deleteAndRepair" />
 
-			<tx:method name="get*" propagation="SUPPORTS" />
-			<tx:method name="find*" propagation="SUPPORTS" />
+			<tx:method name="get*" />
+			<tx:method name="find*"  />
 			<tx:method name="load*" propagation="SUPPORTS" />
 			<tx:method name="search*" propagation="SUPPORTS" />
 			<tx:method name="datagrid*" propagation="SUPPORTS" />
@@ -116,7 +116,7 @@ http://www.springframework.org/schema/context/spring-context-3.1.xsd"
 	 
 	<!-- -->
 	<aop:config>
-		<aop:pointcut id="transactionPointcut" expression="execution(* com.cyc.hibernate..*DAO.*(..))" />
+		<aop:pointcut id="transactionPointcut" expression="execution(* com.cyc.hibernate..*.*(..))" />
 		<aop:advisor pointcut-ref="transactionPointcut" advice-ref="transactionAdvice" />
 	</aop:config>
  

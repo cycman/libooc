@@ -1,16 +1,10 @@
 package com.cyc.util.log;
 
-public class ControlLog extends AbstracMyLog {
+public class ServiceLog extends AbstracMyLog {
 
-	public ControlLog(Class wClass) {
+	public ServiceLog(Class wClass) {
 		super(wClass);
 		// TODO Auto-generated constructor stub
-	}
-	
-	public void info(String map,String content)
-	{
-			
-			System.out.println(map+"::::>"+content);
 	}
 
 	@Override
@@ -49,13 +43,17 @@ public class ControlLog extends AbstracMyLog {
 		
 	}
 
-	
-
 	@Override
 	public void info(Object arg0, Throwable arg1) {
 		// TODO Auto-generated method stub
 		
 	}
+	@Override
+	 public void info(Object arg0) {		
+		super.info(arg0);
+		System.out.println(arg0);
+		
+	};
 
 	@Override
 	public boolean isDebugEnabled() {
@@ -116,6 +114,6 @@ public class ControlLog extends AbstracMyLog {
 		// TODO Auto-generated method stub
 		
 	}
-	
+
 
 }

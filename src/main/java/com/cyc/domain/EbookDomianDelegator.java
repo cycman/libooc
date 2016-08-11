@@ -109,26 +109,29 @@ public class EbookDomianDelegator {
 		this.volume = volume;
 	}
 	
-	public EbookDomianDelegator(EbookDomain ebookDomain)
+	public EbookDomianDelegator(EbookDomain ebookDomain)  throws Exception
 	{
 		this.imgurl=ConfigManage.GLOBAL_STRING_CONFIG.get(IMG_HEARD)+ebookDomain.getImageUrl();
 		InitDelegator(ebookDomain);
 		
 	}
-	private void InitDelegator(EbookDomain ebookDomain) {
+	private void InitDelegator(EbookDomain ebookDomain) throws Exception  {
 		// TODO Auto-generated method stub
-		this.author=ebookDomain.getAuthors();
-		this.edition=ebookDomain.getEdition();
-		this.title=ebookDomain.getTitle();
-		this.extension=ebookDomain.getExtension();
-		this.language=ebookDomain.getLanguage();
-		this.MD5=ebookDomain.getMD5();
-		this.publisher=ebookDomain.getPublisher();
-		this.page=ebookDomain.getPages();
-		this.size=(Double.valueOf(ebookDomain.getSizeByte())/1024/1024)+"m";
-		this.topic=ebookDomain.getTOPICANDORIGINFILENAME();
-		this.year=ebookDomain.getYear();
-		this.volume=ebookDomain.getVolume();
+		
+		 
+			this.author=ebookDomain.getAuthors();
+			this.edition=ebookDomain.getEdition();
+			this.title=ebookDomain.getTitle();
+			this.extension=ebookDomain.getExtension();
+			this.language=ebookDomain.getLanguage();
+			this.MD5=ebookDomain.getMD5();
+			this.publisher=ebookDomain.getPublisher();
+			this.page=ebookDomain.getPages();
+			this.size=(Double.valueOf(ebookDomain.getSizeByte())/1024/1024)+"m";
+			this.topic=ebookDomain.getTOPICANDORIGINFILENAME();
+			this.year=ebookDomain.getYear();
+			this.volume=ebookDomain.getVolume();
+		 
 		
 	}
 	

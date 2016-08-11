@@ -313,7 +313,7 @@ public class SearchUtil extends BaseUtil {
 
             int temp=1;
             for (ScoreDoc scoreDoc : scoreDocs) {
-            	if((Integer.valueOf(page)*Integer.valueOf(pagesize)-temp)>
+            	if((Integer.valueOf(page)*Integer.valueOf(pagesize)-temp)>=
             	((Integer.valueOf(page)-1)*Integer.valueOf(pagesize))){
                 Document doc = searcher.doc(scoreDoc.doc);
 //                logger.info("doc信息：" + " docId=" + scoreDoc.doc + " id=" + doc.get("id") + " author="

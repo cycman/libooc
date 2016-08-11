@@ -28,7 +28,7 @@ public class EbookDomailCtl {
 	 
     @RequestMapping(value="/detail",produces="text/html;charset=gbk")  
    @ResponseBody
-	 public String findebook(String ebid)
+	 public String findebook(String ebid) throws Exception
 	 {
 		ebLog.info("ebid>>>>>>>"+ebid);
 		EbookDomain ebookDomain= ebookService.findbyEid(ebid);

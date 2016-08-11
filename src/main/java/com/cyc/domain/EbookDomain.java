@@ -17,7 +17,7 @@ import javax.persistence.Table;
 
 	
 	Integer ID;
-	String eb_ID;//a
+	Integer eb_ID;//a
 	String Title;//b
 	String Volume;//c  none
 	
@@ -59,9 +59,7 @@ import javax.persistence.Table;
 //	String AY;
 	
 	
-	//key
-	@Column(name="ID")
-	@Id
+	
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	public Integer getID() {
 		return ID;
@@ -75,10 +73,13 @@ import javax.persistence.Table;
 	public void setSeries(String series) {
 		this.series = series;
 	}
-	public String getEb_ID() {
+	//key
+		@Column(name="eb_ID")
+		@Id
+	public Integer getEb_ID() {
 		return eb_ID;
 	}
-	public void setEb_ID(String eb_ID) {
+	public void setEb_ID(Integer eb_ID) {
 		this.eb_ID = eb_ID;
 	}
 	public String getTitle() {

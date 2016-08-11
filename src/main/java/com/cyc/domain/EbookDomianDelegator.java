@@ -120,7 +120,7 @@ public class EbookDomianDelegator {
 		this.author=ebookDomain.getAuthors();
 		this.edition=ebookDomain.getEdition();
 		this.title=ebookDomain.getTitle();
-		this.extension=ebookDomain.getEdition();
+		this.extension=ebookDomain.getExtension();
 		this.language=ebookDomain.getLanguage();
 		this.MD5=ebookDomain.getMD5();
 		this.publisher=ebookDomain.getPublisher();

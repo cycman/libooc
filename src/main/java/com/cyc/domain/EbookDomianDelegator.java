@@ -3,6 +3,7 @@ package com.cyc.domain;
 import javax.ejb.Init;
 
 import com.cyc.config.ConfigManage;
+import com.cyc.exception.MyException;
 
 public class EbookDomianDelegator {
 
@@ -119,18 +120,26 @@ public class EbookDomianDelegator {
 		// TODO Auto-generated method stub
 		
 		 
-			this.author=ebookDomain.getAuthors();
-			this.edition=ebookDomain.getEdition();
-			this.title=ebookDomain.getTitle();
-			this.extension=ebookDomain.getExtension();
-			this.language=ebookDomain.getLanguage();
-			this.MD5=ebookDomain.getMD5();
-			this.publisher=ebookDomain.getPublisher();
-			this.page=ebookDomain.getPages();
-			this.size=(Double.valueOf(ebookDomain.getSizeByte())/1024/1024)+"m";
-			this.topic=ebookDomain.getTOPICANDORIGINFILENAME();
-			this.year=ebookDomain.getYear();
-			this.volume=ebookDomain.getVolume();
+			try {
+				this.author=ebookDomain.getAuthors();
+				this.edition=ebookDomain.getEdition();
+				this.title=ebookDomain.getTitle();
+				this.extension=ebookDomain.getExtension();
+				this.language=ebookDomain.getLanguage();
+				this.MD5=ebookDomain.getMD5();
+				this.publisher=ebookDomain.getPublisher();
+				this.page=ebookDomain.getPages();
+				this.size=(Double.valueOf(ebookDomain.getSizeByte())/1024/1024)+"m";
+				this.topic=ebookDomain.getTOPICANDORIGINFILENAME();
+				this.year=ebookDomain.getYear();
+				this.volume=ebookDomain.getVolume();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				MyException myException = new MyException(e,EbookDomain.class);
+				myException.setERROR_CODE("1000001");
+				throw myException;
+			}
 		 
 		
 	}

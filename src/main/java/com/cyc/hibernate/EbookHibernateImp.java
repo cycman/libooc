@@ -6,6 +6,7 @@ import org.hibernate.Session;
 import org.springframework.stereotype.Component;
 
 import com.cyc.domain.EbookDomain;
+import com.cyc.exception.MyException;
 import com.cyc.hibernate.core.BaseHibernateDAOImp;
 
 @Component
@@ -20,7 +21,7 @@ public  class EbookHibernateImp extends BaseHibernateDAOImp<EbookDomain> impleme
 	 * @see com.cyc.hibernate.IebookDao#findByColum(java.lang.String, java.lang.Object)
 	 */
 	@Override
-	public EbookDomain findByColum(String colum,Object  params) {
+	public EbookDomain findByColum(String colum,Object  params) throws Exception {
 		// TODO Auto-generated method stub
 		 
 		String hql = "from ebook_t as eb where 1=1";
@@ -34,8 +35,12 @@ public  class EbookHibernateImp extends BaseHibernateDAOImp<EbookDomain> impleme
 		 
 		
 		List<EbookDomain> domains = session.createQuery(hql).list();
-		
+		if(domains.size()>0)
 		return domains.get(0);
+		else {
+		throw 	new MyException(MyException.ERROR_EBID_NULL,new Exception(), getClass());
+				
+		}
 	}
  
 

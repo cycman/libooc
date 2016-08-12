@@ -12,7 +12,7 @@ public interface IebookDao {
 	public static String EBOOK_COLUM_ID="id";
 	
 	
-	EbookDomain findByColum(String colum,Object  params);
+	EbookDomain findByColum(String colum,Object  params) throws Exception;
 	
 	
 	

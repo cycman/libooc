@@ -23,24 +23,37 @@ public  class EbookHibernateImp extends BaseHibernateDAOImp<EbookDomain> impleme
 	@Override
 	public EbookDomain findByColum(String colum,Object  params) throws Exception {
 		// TODO Auto-generated method stub
-		 
-		String hql = "from ebook_t as eb where 1=1";
-		
-		Session session= getSession();
-		if(params!=null)
-		{
-			hql+= " and "+colum+"="+params;
+		Session session=null;
+		try {
+			String hql = "from ebook_t as eb where 1=1";
+			
+			session = getSession();
+			if(params!=null)
+			{
+				hql+= " and "+colum+"="+params;
+				
+			}
+			 
+			
+			List<EbookDomain> domains = session.createQuery(hql).list();
+			if(domains.size()>0)
+			return domains.get(0);
+			else {
+			throw 	new MyException(MyException.ERROR_EBID_NULL,new Exception(), getClass());
+					
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw e;
+		}
+		finally{
+			
+			if(session!=null)
+				session.close();
 			
 		}
 		 
-		
-		List<EbookDomain> domains = session.createQuery(hql).list();
-		if(domains.size()>0)
-		return domains.get(0);
-		else {
-		throw 	new MyException(MyException.ERROR_EBID_NULL,new Exception(), getClass());
-				
-		}
 	}
  
 

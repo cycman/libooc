@@ -311,10 +311,10 @@ public class SearchUtil extends BaseUtil {
             ScoreDoc[] scoreDocs = topDocs.scoreDocs;
             logger.info("查询到条数=" + scoreDocs.length);
 
-            int temp=1;
+            int temp=0;
             for (ScoreDoc scoreDoc : scoreDocs) {
-            	if((Integer.valueOf(page)*Integer.valueOf(pagesize)-temp)>=
-            	((Integer.valueOf(page)-1)*Integer.valueOf(pagesize))){
+            	if(temp<(Integer.valueOf(page)*Integer.valueOf(pagesize))&&
+            			temp>=((Integer.valueOf(page)-1)*Integer.valueOf(pagesize))){
                 Document doc = searcher.doc(scoreDoc.doc);
 //                logger.info("doc信息：" + " docId=" + scoreDoc.doc + " id=" + doc.get("id") + " author="
 //                        + doc.get("author") + " name=" + doc.get("name") + " content="

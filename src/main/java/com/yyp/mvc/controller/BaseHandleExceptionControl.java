@@ -21,7 +21,7 @@ public class BaseHandleExceptionControl {
     public String exp(HttpServletRequest request, Exception ex) {  
             // 根据不同错误转向不同页面  
         	
-		
+			ex.printStackTrace();
 			//生成errorview
         
             return JSON.toJSONString(new ErrorView(ex));  

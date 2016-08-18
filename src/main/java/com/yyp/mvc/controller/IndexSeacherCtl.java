@@ -28,7 +28,7 @@ import com.cyc.view.SearchPageView;
  */
 @Controller
 @RequestMapping("/search")
-public class IndexSeacherCtl {
+public class IndexSeacherCtl extends BaseHandleExceptionControl{
 
 	
 	
@@ -41,9 +41,9 @@ public class IndexSeacherCtl {
 	   
 	 
 	 
-	@RequestMapping(value="/default",produces="text/html;charset=gbk")  
+	@RequestMapping(value="/default",produces="text/html;charset=utf-8")  
     @ResponseBody
-    public String defaultSearch(String search,String page,String pagesize)
+    public String defaultSearch(String search,String page,String pagesize) throws Exception
 	{
 		 controllog.info("default"+"::::>"+"searchfor::::>"+search+"::::>"+page+"::::>"+pagesize);
 		  
@@ -53,8 +53,8 @@ public class IndexSeacherCtl {
          view.setIndexs(indexs);
          view.setPage(page);
          view.setPagesize(pagesize);
-         view.setNextPageUrl(PAGEURL+"default?"+"search="+search+"&page="+(Integer.valueOf(page)+1)+"&pagesize="+Integer.valueOf(pagesize)+1);
-         view.setPrviousPageUrl(PAGEURL+"default?"+"search="+search+"&page="+(Integer.valueOf(page)-1)+"&pagesize="+Integer.valueOf(pagesize)+1);
+         view.setNextPageUrl(PAGEURL+"default?"+"search="+search+"&page="+(Integer.valueOf(page)+1)+"&pagesize="+(Integer.valueOf(pagesize)));
+         view.setPrviousPageUrl(PAGEURL+"default?"+"search="+search+"&page="+(Integer.valueOf(page)-1)+"&pagesize="+(Integer.valueOf(pagesize)));
          view.setMaxIndexs(IndexSearchSer.INDEXNUMMAP.get(search));
  		 
          return  JSON.toJSONString(view);

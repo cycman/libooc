@@ -11,7 +11,7 @@ public class EbookDomianDelegator {
 	public static String IMG_HEARD="img_heard";
 	//作者
 	private String author;
-	
+	private String isbn;
 	private String title;
 	private String year;
 	private String publisher;
@@ -21,6 +21,12 @@ public class EbookDomianDelegator {
 	private String size;
 	private String extension;
 	private String page;
+	public String getIsbn() {
+		return isbn;
+	}
+	public void setIsbn(String isbn) {
+		this.isbn = isbn;
+	}
 	private String edition;
 	private String language;
 	private String shorDescrib;
@@ -129,6 +135,7 @@ public class EbookDomianDelegator {
 				this.MD5=ebookDomain.getMD5();
 				this.publisher=ebookDomain.getPublisher();
 				this.page=ebookDomain.getPages();
+				this.isbn=ebookDomain.getIsbn();
 				this.size=(Double.valueOf(ebookDomain.getSizeByte())/1024/1024)+"m";
 				this.topic=ebookDomain.getTOPICANDORIGINFILENAME();
 				this.year=ebookDomain.getYear();

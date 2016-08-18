@@ -1,6 +1,7 @@
 package com.cyc.service;
 
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,10 +28,11 @@ public class IndexSearchSer {
 	 * 
 	 * 默认进行模糊搜索
 	 * @return
+	 * @throws Exception 
 	 */
-	public  List<EbookIndex> IndexSearchDefault(String search,String page,String pagesize)	
+	public  List<EbookIndex> IndexSearchDefault(String search,String page,String pagesize) throws Exception	
 	{
-		   try {
+		  
 			   		
 		            //IndexUtil.numDocs();
 		            //多条查找
@@ -45,15 +47,13 @@ public class IndexSearchSer {
 		          }
 		          
 		          return ParamIndexToBean(docs);
-		        } catch (Exception e) {
-		          //  assertTrue(e.getMessage(), false);
-		        }
-		         return null;
-		        
+		         
+		       
+ 		        
 	}
 	
 	
-	public static List<EbookIndex> ParamIndexToBean(List<Document>docs)
+	public static List<EbookIndex> ParamIndexToBean(List<Document>docs) throws UnsupportedEncodingException
 	{
 		List<EbookIndex>indexs = new ArrayList<>();
 		

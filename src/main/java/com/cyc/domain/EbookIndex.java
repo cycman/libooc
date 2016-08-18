@@ -1,5 +1,7 @@
 package com.cyc.domain;
 
+import java.io.UnsupportedEncodingException;
+
 public class EbookIndex {
 
 	private String author;
@@ -9,14 +11,17 @@ public class EbookIndex {
 	public String getAuthor() {
 		return author;
 	}
-	public void setAuthor(String author) {
-		this.author = author;
+	public void setAuthor(String author) throws UnsupportedEncodingException {
+		this.author=new String(author.getBytes("gbk"),"utf-8");
+		//this.author = author;
 	}
 	public String getTitle() {
 		return title;
 	}
-	public void setTitle(String title) {
-		this.title = title;
+	public void setTitle(String title) throws UnsupportedEncodingException  {
+		this.title=new String(title.getBytes("gbk"),"utf-8");
+
+		//this.title = title;
 	}
 	public String getE_id() {
 		return e_id;

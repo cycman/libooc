@@ -127,16 +127,21 @@ public class EbookDomianDelegator {
 		
 		 
 			try {
-				this.author=ebookDomain.getAuthors();
+				this.author= new String(
+						ebookDomain.getAuthors().getBytes("gbk"),"utf-8");
 				this.edition=ebookDomain.getEdition();
-				this.title=ebookDomain.getTitle();
+				this.title=new String(
+						ebookDomain.getTitle().getBytes("gbk"),"utf-8");
 				this.extension=ebookDomain.getExtension();
 				this.language=ebookDomain.getLanguage();
 				this.MD5=ebookDomain.getMD5();
-				this.publisher=ebookDomain.getPublisher();
+				this.publisher= new String(
+						ebookDomain.getPublisher().getBytes("gbk"),"utf-8");
 				this.page=ebookDomain.getPages();
 				this.isbn=ebookDomain.getIsbn();
-				this.size=(Double.valueOf(ebookDomain.getSizeByte())/1024/1024)+"m";
+				java.text.DecimalFormat   df   =new   java.text.DecimalFormat("#.00");  
+				 
+				this.size=(df.format(Double.valueOf(ebookDomain.getSizeByte())/1024/1024))+"m";
 				this.topic=ebookDomain.getTOPICANDORIGINFILENAME();
 				this.year=ebookDomain.getYear();
 				this.volume=ebookDomain.getVolume();

@@ -15,5 +15,6 @@ public interface IBaseHibernateDAO<T> {
 	public void delete(T t);
     List<T> findByPage(String hql,int page,int pagesize);
     List<T> findByPage(String hql,int page,int pagesize,Object...params);
- 	
+ 	public void update(T t);
+    
 }

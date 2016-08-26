@@ -1,5 +1,7 @@
 package com.yyp.mvc.controller;
 
+import java.util.logging.Logger;
+
 import javax.json.Json;
 
 import org.apache.commons.logging.Log;
@@ -10,12 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
-import com.cyc.domain.EbookDomain;
 import com.cyc.exception.MyException;
-import com.cyc.hibernate.EbookHibernateImp;
+import com.cyc.hibernate.domain.EbookDomain;
+import com.cyc.hibernate.imp.EbookHibernateImp;
 import com.cyc.service.EbookService;
-import com.cyc.util.log.ControlLog;
-import com.cyc.view.BaseView;
+ import com.cyc.view.BaseView;
 import com.cyc.view.EbookView;
 import com.cyc.view.ErrorView;
 
@@ -28,13 +29,13 @@ public class EbookDomailCtl extends BaseHandleExceptionControl {
 
 	 @Autowired
 	 private EbookService ebookService;
-	 private Log ebLog= new ControlLog(EbookService.class);
+	 private Logger log= Logger.getLogger(this.getClass().getName());
 	 
     @RequestMapping(value="/detail",produces="text/html;charset=gbk")  
    @ResponseBody
 	 public String findebook(String ebid) throws Exception 
 	 {
-		ebLog.info("ebid>>>>>>>"+ebid);
+    	log.info("ebid>>>>>>>"+ebid);
 		EbookDomain ebookDomain;
 		EbookView ebookView = null;
 		try {

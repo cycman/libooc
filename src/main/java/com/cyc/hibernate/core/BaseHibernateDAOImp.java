@@ -6,10 +6,11 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.cyc.domain.EbookDomain;
+import com.cyc.hibernate.domain.EbookDomain;
 
 
 /**
@@ -24,6 +25,7 @@ public class BaseHibernateDAOImp<T> implements IBaseHibernateDAO<T> {
 		private static SessionFactory sessionFactory ;
 		protected int rowsCount;
 
+		
 		public void setSessionFactory(SessionFactory sessionFactory) {
 			this.sessionFactory = sessionFactory;
 		}
@@ -37,7 +39,10 @@ public class BaseHibernateDAOImp<T> implements IBaseHibernateDAO<T> {
 		@Override
 		public void save(T t) {
 			// TODO Auto-generated method stub
-			getSession().save(t);
+			Session session= getSession();
+			session.save(t);
+			
+			session.close();
 		}
 
 		@Override
@@ -93,9 +98,20 @@ public class BaseHibernateDAOImp<T> implements IBaseHibernateDAO<T> {
 					.setMaxResults(pageSize).list();
 		}
 
+		@Override
+		public void update(T t) {
+			// TODO Auto-generated method stub
+			
+			
+			Session session= getSession();
+			Transaction transaction= session.beginTransaction();
+			session.update(t);
+			transaction.commit();
+ 			session.close();
+ 		}
+
 		 
-		
-		
+		 
 		
 	
 }

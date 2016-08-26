@@ -1,13 +1,14 @@
-package com.cyc.hibernate;
+package com.cyc.hibernate.imp;
 
 import java.util.List;
 
 import org.hibernate.Session;
 import org.springframework.stereotype.Component;
 
-import com.cyc.domain.EbookDomain;
 import com.cyc.exception.MyException;
 import com.cyc.hibernate.core.BaseHibernateDAOImp;
+import com.cyc.hibernate.dao.IebookDao;
+import com.cyc.hibernate.domain.EbookDomain;
 
 @Component
 public  class EbookHibernateImp extends BaseHibernateDAOImp<EbookDomain> implements IebookDao{

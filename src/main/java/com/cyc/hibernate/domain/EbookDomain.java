@@ -1,4 +1,4 @@
-package com.cyc.domain;
+package com.cyc.hibernate.domain;
 
  import javax.persistence.CascadeType;
 import javax.persistence.Column;

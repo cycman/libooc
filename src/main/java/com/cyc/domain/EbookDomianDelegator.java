@@ -4,6 +4,7 @@ import javax.ejb.Init;
 
 import com.cyc.config.ConfigManage;
 import com.cyc.exception.MyException;
+import com.cyc.hibernate.domain.EbookDomain;
 
 public class EbookDomianDelegator {
 

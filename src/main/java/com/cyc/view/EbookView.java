@@ -1,7 +1,7 @@
 package com.cyc.view;
 
-import com.cyc.domain.EbookDomain;
 import com.cyc.domain.EbookDomianDelegator;
+import com.cyc.hibernate.domain.EbookDomain;
 
 public class EbookView extends BaseView {
 

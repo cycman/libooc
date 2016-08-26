@@ -1,6 +1,6 @@
-package com.cyc.hibernate;
+package com.cyc.hibernate.dao;
 
-import com.cyc.domain.EbookDomain;
+import com.cyc.hibernate.domain.EbookDomain;
 
 public interface IebookDao {
 

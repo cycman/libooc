@@ -3,9 +3,9 @@ package com.cyc.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.cyc.domain.EbookDomain;
 import com.cyc.exception.MyException;
-import com.cyc.hibernate.EbookHibernateImp;
+import com.cyc.hibernate.domain.EbookDomain;
+import com.cyc.hibernate.imp.EbookHibernateImp;
 
 @Component
 public class EbookService {

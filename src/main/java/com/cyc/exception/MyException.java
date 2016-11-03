@@ -5,8 +5,10 @@ public class MyException extends Exception {
 	
 	public static final String ERROR_EBID_NOT_NUM = "001";//ebid 为非数字
 	public static final String ERROR_EBID_NULL = "002";//数据库中缺失该记录
-	
-	
+	public static final String ERROR_BUYCODE_USELESS="003";//购买码无效
+	public static final String ERROR_BUYCODE_USEED="004";//购买码使用过了
+	public static final String ERROR_BUY_EMIALNON ="005";//缺少email
+	public static final String ERROR_BUY_EMAILSENDFAIL="006";//email发送失败
 	private Exception exception;
 	private String errorcode="";
 	private Class class1;

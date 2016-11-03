@@ -5,11 +5,15 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.cyc.hibernate.domain.DownLoadRecordDomian;
+import com.cyc.hibernate.domain.IpDomain;
+import com.cyc.hibernate.imp.IpHibernateImp;
 import com.cyc.service.DLoadService;
 
 
@@ -18,7 +22,8 @@ import com.cyc.service.DLoadService;
 public class Helloword {
 	@Autowired
 	DLoadService dLoadService;
-
+	@Autowired 
+	IpHibernateImp iph;
 	
 	@RequestMapping(value="hello",produces="text/html;charset=gbk")  // 瀛恟equest璇锋眰url锛屾嫾鎺ュ悗绛変环浜�test3/login.do
 
@@ -50,14 +55,23 @@ public class Helloword {
     public String downloads() throws Exception
 	{
 		 DownLoadRecordDomian domian= new DownLoadRecordDomian();
-		 domian.setEb2k("ed2k://|file|BC2FC77E177FFA553318039208EF39FA.pdf|87996685|77CA1D49A9694F79CCA2E0CF0E9B90CD|h=2RT44DP6F5K5T7224L4YVQK3YALZYV2P|/");
-		 domian.setEmail1("asfdsadfsdf");
-		 domian.setEmail2("asfsafd");
+		 domian.setEd2k("ed2k://|file|667F229EDBB51FFA0483AB884A3394E9.pdf|4269406|8D8DEB8C1992874691AC94AF5FE49A46|h=EZTBI4OCSMSFHW7DC2RNEHTVBWNU3VFW|/");
+		 domian.setEmail1("597318121@qq.com");
+		 domian.setEmail2("597318121@qq.com");
+		 domian.setPathStored("1000/667F229EDBB51FFA0483AB884A3394E9.pdf");
 		 dLoadService.addDLoadRecord(domian);
 		return  "hello";
 	}
 	
-	
+@RequestMapping(value="ip",produces="text/html;charset=gbk")  // 瀛恟equest璇锋眰url锛屾嫾鎺ュ悗绛変环浜�test3/login.do
+    
+    public String ip(HttpServletRequest request) throws Exception
+	{
+		
+		String ip= request.getRemoteAddr();		
+		iph.save(new IpDomain(ip));
+		return  "hello";
+	}
 	
 	
 }

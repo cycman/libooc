@@ -7,10 +7,17 @@ package com.cyc.util;
  */
  
 import java.util.Properties;
+
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 import javax.mail.*;
 import javax.mail.internet.*;
+
+import com.cyc.config.ConfigManage;
+import com.cyc.exception.MyException;
+import com.cyc.hibernate.domain.DownLoadRecordDomian;
+import com.cyc.hibernate.domain.EbookDomain;
+import com.cyc.hibernate.domain.Ed2kStateDomain;
 
 /**
  * 本程序用java来实现Email的发送，所用到的协议为：SMTP，端口号为25；<br>
@@ -274,6 +281,12 @@ public class JavaEmail {
 
 	public static void main(String[] args) {
 		Doemail();
+//		EbookDomain domain= new EbookDomain();
+//		domain.setAuthors("cyc");
+//		domain.setTitle("sadfsadfsdf");
+//		
+//		sendBuyEmailTo("597318121@qq.com", "asdfasdsf", "www.baidu.com",domain );
+//		
 	}
 
 	public  static void Doemail() {
@@ -292,7 +305,7 @@ public class JavaEmail {
 		themail.setNeedAuth(true);
 		themail.setSubject("JAVA发邮件的测试");// 邮件主题
 		themail.setBody(mailbody);// 邮件正文
-		themail.setTo("597318121@qq.com");// 收件人地址
+		themail.setTo("545646649@qq.com");// 收件人地址
 		themail.setFrom("a597318121@sina.com");// 发件人地址
 		//themail.addFileAffix("c:/test.txt");// 附件文件路径,例如：C:/222.jpg,*注；"/"的写法；
 											// 如果没有可以不写
@@ -300,4 +313,44 @@ public class JavaEmail {
 																	// **改为相应邮箱密码
 		themail.sendout();
 	}
+
+	public static boolean sendBuyEmailTo(String emialto, String buycode, String downpath, EbookDomain ebookDomain)   {
+		// TODO Auto-generated method stub
+		/**
+		 * 
+		 ************* 切切注意********
+		 * 
+		 * 注意 用此程序发邮件必须邮箱支持smtp服务 在2006年以后申请的163邮箱是不支持的 我知道sina邮箱 sohu邮箱 qq邮箱支持
+		 * 但是sina和qq邮箱需要手工设置开启此功能 所以在测试时最好使用这三个邮箱 sina邮箱的smtp设置方法如下 登录sina邮箱
+		 * 依次点击 邮箱设置--->帐户--->POP/SMTP设置 将开启复选框选中 然后保存
+		 * qq授权码  buylxskbksskbbja
+		 ************* 切切注意********
+		 */
+		try {
+			JavaEmail themail =  new JavaEmail(ConfigManage.GLOBAL_STRING_CONFIG.get("smt"));// 这里以新浪邮箱为例子
+			
+			String mailbody = "<a href='http://www.libooc.com' target='_blank'>Libooc免费学术分享</a>全站拥有超过150w的各类外文电子书除部分图书因特殊原因需要收费以外其他全部免费提供给广大互联网爱书的书迷</br>"+
+			ebookDomain.getTitle()+"作者"+ebookDomain.getAuthors()+
+			"点击下方链接即可下载   <a href='"+downpath+"' target='_blank'>下载链接</a></br>"+
+			"<font size='18' color='red'>下载的文件是无后缀的文件请将文件重命名为."+ebookDomain.getExtension()+"结尾文件才能打开</font>"+
+					"</br><font size='16pt' color='red'>请记住您的兑书码"+buycode+"下次下载这本书依然可用</font>"+
+			"</br>对于近期关闭会员的决定实属无奈望大家谅解过段时间网站会重新开启 不要回复此邮件  ";// 邮件正文
+			themail.setNeedAuth(true);
+			themail.setSubject("您在www.libooc.com上兑换的电子书到了。学术免费分享网站LIBOOC感谢您对我们的支持。我们会持续为互联网提供更优质的电子书资源分享渠道");// 邮件主题
+			themail.setBody(mailbody);// 邮件正文
+			themail.setTo(emialto);// 收件人地址
+			themail.setFrom(ConfigManage.GLOBAL_STRING_CONFIG.get("emailfrom"));// 发件人地址
+			//themail.addFileAffix("c:/test.txt");// 附件文件路径,例如：C:/222.jpg,*注；"/"的写法；
+												// 如果没有可以不写
+			themail.setNamePass(ConfigManage.GLOBAL_STRING_CONFIG.get("emailfrom"),ConfigManage.GLOBAL_STRING_CONFIG.get("emailpasswd"));// 发件人地址和密码
+              // **改为相应邮箱密码themail.sendout();
+			return themail.sendout();
+ 
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		//	throw new MyException(MyException.e, JavaEmail.class);
+		}
+ 	}
 }

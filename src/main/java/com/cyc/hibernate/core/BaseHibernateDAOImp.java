@@ -39,9 +39,11 @@ public class BaseHibernateDAOImp<T> implements IBaseHibernateDAO<T> {
 		@Override
 		public void save(T t) {
 			// TODO Auto-generated method stub
-			Session session= getSession();
-			session.save(t);
 			
+			Session session= getSession();
+			Transaction transaction= session.beginTransaction();
+			session.save(t);
+			transaction.commit();
 			session.close();
 		}
 

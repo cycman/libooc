@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.lucene.document.Document;
 import org.springframework.stereotype.Component;
 
+import com.cyc.config.ConfigManage;
 import com.cyc.domain.EbookIndex;
 import com.cyc.lucene.IndexUtil;
 import com.cyc.lucene.SearchUtil;
@@ -52,6 +53,34 @@ public class IndexSearchSer {
  		        
 	}
 	
+
+	/**
+	 * 
+	 * 定制化进行模糊搜索
+	 * @return
+	 * @throws Exception 
+	 */
+	public  List<EbookIndex> IndexSearchDIV(String[] fileds,String search,String page,String pagesize) throws Exception	
+	{
+	
+		
+		
+		   //IndexUtil.numDocs();
+        //多条查找
+        List<Document> docs= new ArrayList<>();
+       //获取搜索结果
+      int maxIndex= SearchUtil.multiFieldQuery(fileds, search, docs,page,pagesize);
+      
+      if(INDEXNUMMAP.get(search)==null)
+      {
+    	  INDEXNUMMAP.put(search, maxIndex);
+      }
+      
+      return ParamIndexToBean(docs);
+		
+	}
+	
+	
 	
 	public static List<EbookIndex> ParamIndexToBean(List<Document>docs) throws UnsupportedEncodingException
 	{
@@ -65,6 +94,10 @@ public class IndexSearchSer {
 			index.setAuthor(doc.get("author"));
 			index.setE_id(doc.get("id"));
 			index.setTitle(doc.get("title"));
+			index.setTopic(doc.get("topic"));
+			index.setImgurl(ConfigManage.GLOBAL_STRING_CONFIG.get("source_img_heard")+doc.get("ImageUrl"));
+			index.setPublisher(doc.get("publisher"));
+			index.setIsbn(doc.get("isbn"));
 			indexs.add(index);
 		}
 		

@@ -1,8 +1,10 @@
 package com.cyc.core.event;
 
+import org.apache.commons.io.monitor.FileAlterationListener;
+
 import com.cyc.core.CoreControlJob;
 
-public interface EventListener {
+public interface EventListener extends FileAlterationListener {
 
 	 	
 	void handelEvent(BaseEvent event);
@@ -11,6 +13,7 @@ public interface EventListener {
 	
 	void fireEvent(BaseEvent event);
 	
+	String getMonitorPath();
 	
 	
 	

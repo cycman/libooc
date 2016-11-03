@@ -10,6 +10,8 @@
     <mvc:annotation-driven>
     </mvc:annotation-driven>
 
+	<context:component-scan base-package="com.cyc.config">
+    </context:component-scan>
     <context:component-scan base-package="com.yyp.mvc.controller">
     </context:component-scan>
     
@@ -17,8 +19,7 @@
     </context:component-scan>
     <context:component-scan base-package="com.cyc.service">
     </context:component-scan>
-    <context:component-scan base-package="com.cyc.config">
-    </context:component-scan>
+
 
     <mvc:default-servlet-handler/>
 

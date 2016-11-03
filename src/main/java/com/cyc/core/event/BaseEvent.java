@@ -20,6 +20,7 @@ public class BaseEvent implements EventType{
 	}
 	protected  String event_state="";
 	protected Ed2kStateDomain ed2k;
+	
 	public String getState()
 	{
 		return event_state;

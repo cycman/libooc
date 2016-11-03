@@ -23,7 +23,7 @@ public class DownLoadRecordDomian {
 	
 	private  String eb_id;
 	
-	private  String eb2k;
+	private  String ed2k;
 	
 	private  String filesize;
 	
@@ -74,11 +74,11 @@ public class DownLoadRecordDomian {
 	public void setEb_id(String eb_id) {
 		this.eb_id = eb_id;
 	}
-	public String getEb2k() {
-		return eb2k;
+	public String getEd2k() {
+		return ed2k;
 	}
-	public void setEb2k(String eb2k) {
-		this.eb2k = eb2k;
+	public void setEd2k(String ed2k) {
+		this.ed2k = ed2k;
 	}
 	public String getFilesize() {
 		return filesize;

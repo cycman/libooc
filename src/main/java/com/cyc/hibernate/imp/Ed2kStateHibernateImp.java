@@ -40,7 +40,27 @@ public class Ed2kStateHibernateImp extends BaseHibernateDAOImp<Ed2kStateDomain> 
 	
 	
 	
-	
+	public List<Ed2kStateDomain> findByColumLike(String Colum,String value)
+	{
+		Session session = null;
+		try {
+			session = getSession();
+			String hql = "from ed2k where "+Colum+" like  '%"+value+"%'";
+			Query query = session.createQuery(hql);
+			 
+			List<Ed2kStateDomain> ed2kStateDomains = query.list();
+
+			return ed2kStateDomains;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		return null;
+	}
 	public List<Ed2kStateDomain> findByColum(String Colum,String value)
 	{
 		Session session = null;

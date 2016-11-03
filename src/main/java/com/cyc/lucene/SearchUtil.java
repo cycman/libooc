@@ -301,7 +301,7 @@ public class SearchUtil extends BaseUtil {
             QueryParser queryParser = new MultiFieldQueryParser(Version.LUCENE_35, fileds,
                     new StandardAnalyzer(Version.LUCENE_35));
 
-            queryParser.setDefaultOperator(QueryParser.AND_OPERATOR);
+            queryParser.setDefaultOperator(QueryParser.OR_OPERATOR);
             Query query = queryParser.parse(search);
 
             // 查询

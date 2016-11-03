@@ -57,7 +57,7 @@ import javax.persistence.Table;
 	String TimeModified;//AW
 	String ImageUrl;//AX
 //	String AY;
-	
+ 	
 	
 	
 	@GeneratedValue(strategy=GenerationType.AUTO)
@@ -70,6 +70,32 @@ import javax.persistence.Table;
 
 	
  
+	public String Ed2k() {
+ 
+		{
+			String ed2k = "";
+			String heard = "ed2k://|FILE|";
+			String md5 = this.getMD5();
+			ed2k += heard+md5;
+
+			String extension = this.getExtension();
+			ed2k += "." + extension + "|";
+
+			String filesize = this.getSizeByte();
+			ed2k += filesize + "|";
+
+			String eDonkey = this.geteDokey();
+			ed2k += eDonkey + "|";
+
+			String Aich = "h=" + this.getAICH();
+			ed2k += Aich + "|/";
+			return ed2k;
+		}
+		
+		
+ 
+	}
+   
 	public void setSeries(String series) {
 		this.series = series;
 	}
@@ -244,6 +270,7 @@ import javax.persistence.Table;
 	public void setImageUrl(String imageUrl) {
 		ImageUrl = imageUrl;
 	}
+	 
 	 
 	
 //	String Q;

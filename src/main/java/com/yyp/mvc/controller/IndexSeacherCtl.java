@@ -26,8 +26,8 @@ import com.cyc.view.SearchPageView;
 @Controller
 @RequestMapping("/search")
 public class IndexSeacherCtl extends BaseHandleExceptionControl {
-
-	public static String PAGEURL = "search/";
+	
+ 	public static String PAGEURL = "search/";
 
 	// 创建controllog
 	private Logger log = Logger.getLogger(this.getClass().getName());
@@ -41,7 +41,7 @@ public class IndexSeacherCtl extends BaseHandleExceptionControl {
 				+ page + "::::>" + pagesize);
 
 		SearchPageView view = new SearchPageView();
-		List<EbookIndex> indexs = seacher.IndexSearchDefault(search, page,
+		List<EbookIndex> indexs = seacher.IndexSearchDIV(EbookIndex.DEFAULTINDEXS,search, page,
 				pagesize);
 
 		view.setIndexs(indexs);
@@ -57,5 +57,35 @@ public class IndexSeacherCtl extends BaseHandleExceptionControl {
 
 		return JSON.toJSONString(view);
 	}
+	
+	
+	@RequestMapping(value = "/FiledsSearch", produces = "text/html;charset=utf-8")
+	@ResponseBody
+	public String FiledsSearch(String fileds,String search, String page, String pagesize)
+			throws Exception {
+		log.info("FiledsSearch" + "::::>" + "searchfor::::>" + search + "::::>"
+				+ page + "::::>" + pagesize);
+
+		SearchPageView view = new SearchPageView();
+		List<EbookIndex> indexs = seacher.IndexSearchDIV(fileds.split(","),search, page,
+				pagesize);
+
+		view.setIndexs(indexs);
+		view.setPage(page);
+		view.setPagesize(pagesize);
+		view.setNextPageUrl(PAGEURL + "FiledsSearch?fileds="+fileds+"&search=" + search
+				+ "&page=" + (Integer.valueOf(page) + 1) + "&pagesize="
+				+ (Integer.valueOf(pagesize)));
+		view.setPrviousPageUrl(PAGEURL + "FiledsSearch?fileds="+fileds+"&search=" + search
+				+ "&page=" + (Integer.valueOf(page) - 1) + "&pagesize="
+				+ (Integer.valueOf(pagesize)));
+		view.setMaxIndexs(IndexSearchSer.INDEXNUMMAP.get(search));
+
+		return JSON.toJSONString(view);
+		
+		
+	}
+	
+	
 
 }

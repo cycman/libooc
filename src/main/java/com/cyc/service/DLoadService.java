@@ -1,11 +1,15 @@
 package com.cyc.service;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
+import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.cyc.config.ConfigManage;
 import com.cyc.core.CoreControlJob;
 import com.cyc.core.event.BaseEvent;
 import com.cyc.core.event.DLRecordEvent;
@@ -27,31 +31,33 @@ public class DLoadService implements EventListener {
 	@Autowired
 	Ed2kStateHibernateImp ed2kStateHibernateImp;
 
+	
+	private Logger logger = Logger.getLogger(this.getClass().getName());
 	public DLoadService() {
-		regist(this);
-		new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-
-				while (true) {
-					try {
-						Thread.sleep(2000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					if (dloadHibernateImp != null) {
-
-						BaseEvent event = new InnitDLoadEvent(getundownload());
-						CoreControlJob.Instance().fireEvent(event);
-						break;
-
-					}
-				}
-			}
-		}).start();
+//		regist(this);
+//		new Thread(new Runnable() {
+//
+//			@Override
+//			public void run() {
+//				// TODO Auto-generated method stub
+//
+//				while (true) {
+//					try {
+//						Thread.sleep(2000);
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//					if (dloadHibernateImp != null) {
+//
+//						BaseEvent event = new InnitDLoadEvent(getundownload());
+//						CoreControlJob.Instance().fireEvent(event);
+//						break;
+//
+//					}
+//				}
+//			}
+//		}).start();
 
 	}
 
@@ -63,12 +69,13 @@ public class DLoadService implements EventListener {
 		dloadHibernateImp.save(loadRecordDomian);
 		DLRecordEvent event = null;
 		Ed2kStateDomain domain = ed2kStateHibernateImp
-				.findByEd2k(loadRecordDomian.getEb2k());
+				.findByEd2k(loadRecordDomian.getEd2k());
 		if (domain == null) {
 
 			domain = new Ed2kStateDomain(loadRecordDomian.getEb_id(),
-					loadRecordDomian.getEb2k(), "未下载");
+					loadRecordDomian.getEd2k(), "未下载");
 			domain.setEbid(loadRecordDomian.getEb_id());
+			domain.setFilePath(loadRecordDomian.getPathStored());
 			ed2kStateHibernateImp.save(domain);
 			event = new DLRecordEvent(EventType.DLRECORDSTORED, domain);
 			fireEvent(event);
@@ -78,7 +85,7 @@ public class DLoadService implements EventListener {
 				event = new DLRecordEvent(EventType.DLRECORDSTORED, domain);
 				fireEvent(event);
 			}
-			if("下载成功".endsWith(domain.getState()))
+			if("下载成功".equals(domain.getState()))
 			{
 				event = new DLRecordEvent(EventType.DOWNLOADSUCCESS, domain);
 				fireEvent(event);
@@ -88,8 +95,8 @@ public class DLoadService implements EventListener {
 	}
 
 	public List<Ed2kStateDomain> getundownload() {
-		String[] colums = new String[] { "state", "state", "state","state"};
-		String[] values = new String[] { "准备下载", "未下载", "下载失败","正在下载" };
+		String[] colums = new String[] { "state", "state", "state"};
+		String[] values = new String[] { "准备下载", "未下载", "下载失败" };
 		return ed2kStateHibernateImp.findByColumsOr(colums, values);
 
 	}
@@ -128,12 +135,6 @@ public class DLoadService implements EventListener {
 			ed2kStateHibernateImp.update(event.getEd2kStateDomain());
 
 			break;
-		case EventType.DOWNLOADSUCCESS:
-			event.getEd2kStateDomain().setState("下载成功");
-			if(!isdownloadsuccessed(event.getEd2kStateDomain().getEd2k()))
-			ed2kStateHibernateImp.update(event.getEd2kStateDomain());
-
-			break;
 		case EventType.DOWOFAILD:
 			event.getEd2kStateDomain().setState("下载失败");
 			if(!isdownloadsuccessed(event.getEd2kStateDomain().getEd2k()))
@@ -167,6 +168,117 @@ public class DLoadService implements EventListener {
 		
 		return false;
 	}
+
+	@Override
+	public void onDirectoryChange(File arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onDirectoryCreate(File arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onDirectoryDelete(File arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onFileChange(File arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onFileCreate(File arg0) {
+		// TODO Auto-generated method stub
+		 if( arg0.getAbsolutePath().endsWith("xltd"))
+		 {
+			 if(arg0.getName().split("\\.").length>=4)
+			 {
+				 String ed2k = arg0.getName().split("\\.")[0];
+				 logger.info("检测到"+ed2k+"正在下载");
+				 List<Ed2kStateDomain>domains= ed2kStateHibernateImp.findByColumLike("ed2k", ed2k);
+				 if(domains == null || domains.size()==0)
+				 {
+					 return ;
+				 }
+				Ed2kStateDomain domain=domains.get(0);
+				if(!domain.getEd2k().contains(ed2k))
+				{
+					logger.warning("检测错误"+ed2k);
+					return;
+				}
+				BaseEvent event = new BaseEvent();
+				event.setEd2kStateDomain(domain);
+				//通知事件正在下载
+				event.setEvent_state(EventType.DOWONING);
+				fireEvent(event);
+				
+			 }
+		 }
+		 else 
+		 {
+ 			 {
+				 String ed2k = arg0.getName();
+				 logger.info("检测到"+ed2k+"下载成功");
+				 List<Ed2kStateDomain>domains= ed2kStateHibernateImp.findByColumLike("ed2k", ed2k);
+				 if(domains == null || domains.size()==0)
+				 {
+					 return ;
+				 }
+				Ed2kStateDomain domain=domains.get(0);
+				if(!domain.getEd2k().contains(ed2k))
+				{
+					logger.warning("下载成功检测失败");
+					return;
+				}
+				BaseEvent event = new BaseEvent();
+				
+				event.setEd2kStateDomain(domain);
+				//通知事件正在下载
+				event.setEvent_state(EventType.DOWNLOADSUCCESS);
+				domain.setState("下载成功");
+				if(!isdownloadsuccessed(domain.getEd2k()))
+				   ed2kStateHibernateImp.update(domain);
+				fireEvent(event);
+				
+			 }
+		 }
+		 
+		 
+		 
+		
+	}
+
+	@Override
+	public void onFileDelete(File arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStart(FileAlterationObserver arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStop(FileAlterationObserver arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getMonitorPath() {
+		// TODO Auto-generated method stub
+		return ConfigManage.GLOBAL_STRING_CONFIG.get("job_monitorpath");
+	}
+
 	
 
 }

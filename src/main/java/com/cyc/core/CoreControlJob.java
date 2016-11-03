@@ -4,6 +4,8 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -15,15 +17,18 @@ import java.util.logging.Logger;
 
 import javax.enterprise.inject.Instance;
 
+import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.apache.commons.logging.Log;
 
 import antlr.debug.Event;
 
+import com.cyc.config.ConfigManage;
 import com.cyc.core.event.BaseEvent;
+import com.cyc.core.event.EmailEvent;
 import com.cyc.core.event.EventListener;
 import com.cyc.core.event.EventType;
 import com.cyc.core.event.InnitDLoadEvent;
-import com.cyc.event.EmailEvent;
+import com.cyc.core.event.UploadEvent;
 import com.cyc.hibernate.domain.DownLoadRecordDomian;
 import com.cyc.hibernate.domain.Ed2kStateDomain;
 import com.cyc.util.JavaEmail;
@@ -33,6 +38,7 @@ public class CoreControlJob extends Thread implements EventListener {
 
 	private Logger log;
 
+	private  ZJPFileMonitor monitor;
 	// 事件列表
 	private static List<BaseEvent> events = new ArrayList<>();
 	// 待刪除時間列表
@@ -57,9 +63,12 @@ public class CoreControlJob extends Thread implements EventListener {
 	private static List<EventListener> listeners = new ArrayList<>();
 
 	private static DLRJob mainJob;
-	
+
 	private static EmailJob emailJob;
 
+ 
+	
+	private int monitorTime;
 	public void regist(EventListener listener) {
 		if (!listeners.contains(this)) {
 			listeners.add(this);
@@ -68,6 +77,12 @@ public class CoreControlJob extends Thread implements EventListener {
 		if (!listeners.contains(listener)) {
 			listeners.add(listener);
 		}
+		if(monitor!=null)
+		{
+			if(listener.getMonitorPath()!=null)
+			monitor.monitor( listener.getMonitorPath(), listener);
+		}
+		 
 	}
 
 	public void fireEvent(BaseEvent event) {
@@ -82,9 +97,16 @@ public class CoreControlJob extends Thread implements EventListener {
 			innit();
 			log.info("核心控制器正在初始化");
 			mainJob = new DLRJob(this);
-
+			emailJob = new EmailJob(this);
+			
 			innitStartJob();
 			this.start();
+			try {
+				monitor.start();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			log.info("核心控制器初始化完毕");
 		}
 	}
@@ -159,6 +181,18 @@ public class CoreControlJob extends Thread implements EventListener {
 		// TODO Auto-generated method stub
 		// log準備
 		log = Logger.getLogger(this.getClass().getName());
+ 		monitorTime = Integer.valueOf(ConfigManage.GLOBAL_STRING_CONFIG.get("job_monitor_time"));
+		try {
+			log.info("corecontroljob  monitor 开始初始化");
+			monitor = new ZJPFileMonitor(monitorTime);
+			log.info("corecontroljob  monitor 开始初完毕");
+
+			 
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}  
+	       
 
 	}
 
@@ -207,13 +241,19 @@ public class CoreControlJob extends Thread implements EventListener {
 			}
 
 			break;
-		// 正在下载但是未检测
-		case EventType.DOWONINGUNCHECK:
-			jobs_fixedThreadPool.submit(new DLoadingJob(this, event
-					.getEd2kStateDomain()));
-
+ 
+			
+		case EventType.UPLOADLIST:
+			for(Ed2kStateDomain domain: ((UploadEvent)event).getDomians())
+			jobs_fixedThreadPool.submit(new ULoadingJob(this, domain));
+			
 			break;
-		// 系统初始化下载
+			
+		case EventType.UPLOADDOMAIN:
+			jobs_fixedThreadPool.submit(new ULoadingJob(this, event
+					.getEd2kStateDomain()));
+		     break;
+			
 		case EventType.INNITDLOAD:
 			InnitDLoadEvent event2 = (InnitDLoadEvent) event;
 			for (Ed2kStateDomain domian : event2.getDomians())
@@ -241,6 +281,8 @@ public class CoreControlJob extends Thread implements EventListener {
 		}
 
 	}
+
+ 
 
 	class EmailJob extends Thread {
 		private CoreControlJob coreContrl;
@@ -275,46 +317,50 @@ public class CoreControlJob extends Thread implements EventListener {
 						recordDomian = jobs.get(0);
 						if (recordDomian.getEmail1() != null
 								&& !recordDomian.isEmail1IsSend()) {
-							log.info("准备发送" + recordDomian.getEb2k()
+							log.info("准备发送" + recordDomian.getEd2k()
 									+ "到email1" + recordDomian.getEmail1());
-							DoSendEmail(recordDomian.getEb2k(),
+							DoSendEmail(recordDomian.getEd2k(),
 									recordDomian.getEmail1());
-							recordDomian.setEmail1IsSend(true);							
+							recordDomian.setEmail1IsSend(true);
 							EmailEvent event = new EmailEvent(recordDomian);
 							event.setEvent_state(EventType.EMAIL1SENDSUCCESSED);
-							log.info("发送成功" + recordDomian.getEb2k()
+							log.info("发送成功" + recordDomian.getEd2k()
 									+ "到email1" + recordDomian.getEmail1());
 							recordDomian.setEmail1IsSend(true);
 							controlJob.nofied(event);
 
-
 						}
 						if (recordDomian.getEmail2() != null
 								&& !recordDomian.isEmail2IsSend()) {
-							log.info("准备发送" + recordDomian.getEb2k()
+							log.info("准备发送" + recordDomian.getEd2k()
 									+ "到email2" + recordDomian.getEmail2());
 
-							DoSendEmail(recordDomian.getEb2k(),
+							DoSendEmail(recordDomian.getEd2k(),
 									recordDomian.getEmail2());
 							EmailEvent event = new EmailEvent(recordDomian);
 							event.setEvent_state(EventType.EMAIL2SENDSUCCESSED);
-							log.info("发送成功" + recordDomian.getEb2k()
+							log.info("发送成功" + recordDomian.getEd2k()
 									+ "到email2" + recordDomian.getEmail2());
 							recordDomian.setEmail2IsSend(true);
 
 							controlJob.nofied(event);
 
 						}
-						
- 
+
 						// event.setEvent_state(EventType.DOWONINGUNCHECK);
 						// event.setEd2kStateDomain(recordDomian);
 						// log.info(recordDomian.getEd2k()+"下载中");
 
 					} catch (Exception e) {
+						log.warning("发生了未知异常导致了email发送失败"
+								+ recordDomian.getEd2k()
+								+ recordDomian.getEmail1()
+								+ recordDomian.getEmail2());
 						// TODO Auto-generated catch block
+						// EmailEvent event = new
+						// EmailEvent(((EmailEvent)e).getDomians());
 						BaseEvent event = new BaseEvent();
-						event.setEvent_state(EventType.DOWOFAILD);
+						event.setEvent_state(EventType.EMAILFAILD);
 						// event.setEd2kStateDomain(recordDomian);
 						controlJob.nofied(event);
 						e.printStackTrace();
@@ -331,17 +377,18 @@ public class CoreControlJob extends Thread implements EventListener {
 
 		/**
 		 * 发送邮件
+		 * 
 		 * @param ed2k
 		 * @param email
 		 * @throws Exception
 		 */
-		private void DoSendEmail(String ed2k,String email) throws Exception {
+		private void DoSendEmail(String ed2k, String email) throws Exception {
 			// TODO Auto-generated method stub
-			 try {
+			try {
 				JavaEmail.Doemail();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				log.warning("发送失败"+ed2k+"==========="+"email");
+				log.warning("发送失败" + ed2k + "===========" + "email");
 				throw e;
 			}
 
@@ -383,14 +430,8 @@ public class CoreControlJob extends Thread implements EventListener {
 						log.info("准备下载" + recordDomian.getEd2k());
 						sleep(2000);
 						dodownload(recordDomian.getEd2k());
-						sleep(5000);
-
-						BaseEvent event = new BaseEvent();
-						event.setEvent_state(EventType.DOWONINGUNCHECK);
-						event.setEd2kStateDomain(recordDomian);
+						sleep(5000);						 
 						log.info(recordDomian.getEd2k() + "下载中");
-						controlJob.nofied(event);
-
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						BaseEvent event = new BaseEvent();
@@ -419,6 +460,60 @@ public class CoreControlJob extends Thread implements EventListener {
 
 		}
 
+	}
+
+	@Override
+	public void onDirectoryChange(File arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onDirectoryCreate(File arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onDirectoryDelete(File arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onFileChange(File arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onFileCreate(File arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onFileDelete(File arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStart(FileAlterationObserver arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStop(FileAlterationObserver arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getMonitorPath() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -13,6 +13,14 @@
         	,classpath:hibernate/spring-hibernate.xml
         </param-value>
     </context-param>
+    
+    
+    <context-param>
+        <param-name>log4jpath</param-name>
+        <param-value>d://
+        	
+        </param-value>
+    </context-param>
 
    <!-- <context-param>
         <param-name>log4jConfigLocation</param-name>

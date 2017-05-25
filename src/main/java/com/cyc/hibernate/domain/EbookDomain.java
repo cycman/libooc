@@ -11,8 +11,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
   
-@Entity(name="ebook_t")
-@Table(name="ebook_t")
+@Entity(name="book_base")
+@Table(name="book_base")
  public class EbookDomain {
 
 	
@@ -36,7 +36,7 @@ import javax.persistence.Table;
 	//String J;
 	String Pages;//k
 	String Language;//L
-	//String M;
+	String Topic;//M;
 	String Library;//n
 	String LibraryIssue;//o
 	String Isbn;//P
@@ -51,7 +51,7 @@ import javax.persistence.Table;
 	//String AQ;
 	String URL;//AR;
    //String AS;
-	String TOPICANDORIGINFILENAME;//AT;
+	//String TOPICANDORIGINFILENAME;//AT;
 	//String AU;
 	String TimeAdd;//Av
 	String TimeModified;//AW
@@ -245,11 +245,11 @@ import javax.persistence.Table;
 		URL = uRL;
 	}
 	 
-	public String getTOPICANDORIGINFILENAME() {
-		return TOPICANDORIGINFILENAME;
+	public String getTopic() {
+		return Topic;
 	}
-	public void setTOPICANDORIGINFILENAME(String tOPICANDORIGINFILENAME) {
-		TOPICANDORIGINFILENAME = tOPICANDORIGINFILENAME;
+	public void setTopic(String tOPICANDORIGINFILENAME) {
+		Topic = tOPICANDORIGINFILENAME;
 	}
  
 	public String getTimeAdd() {

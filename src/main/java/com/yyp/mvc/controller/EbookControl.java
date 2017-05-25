@@ -1,5 +1,8 @@
 package com.yyp.mvc.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,7 @@ import com.cyc.service.BuyService;
 import com.cyc.service.EbookService;
 import com.cyc.service.Ed2kLinkService;
 import com.cyc.service.EmailService;
+import com.cyc.service.RecommendSerivce;
 import com.cyc.util.OssClientUtil;
 import com.cyc.view.EbookView;
 import com.cyc.view.Ed2kLinkView;
@@ -24,10 +28,12 @@ import com.cyc.view.LinkIsFreeView;
 
 @Controller
 @RequestMapping("/ebook")
-public class EbookBusinessControl extends BaseHandleExceptionControl {
+public class EbookControl extends BaseHandleExceptionControl {
 
 	@Autowired
 	private EbookService ebookService;
+	@Autowired
+	private RecommendSerivce recommendSerivce;
 	@Autowired
 	private Ed2kLinkService ed2kLinkService;
 	@Autowired
@@ -35,12 +41,12 @@ public class EbookBusinessControl extends BaseHandleExceptionControl {
 	@Autowired
 	private EmailService emailService;
 
-	private Logger log = Logger.getLogger(EbookBusinessControl.class);
+	private Logger log = Logger.getLogger(EbookControl.class);
 
-	@RequestMapping(value = "/detail", produces = "text/html;charset=gbk")
+	@RequestMapping(value = "/detail", produces = "text/html;charset=utf-8")
 	@ResponseBody
 	public String findebook(String ebid) throws Exception {
-		log.log(Priority.toPriority("FILEOUT"),"ebid>>>>>>>" + ebid);
+		log.log(Priority.toPriority("FILEOUT"), "ebid>>>>>>>" + ebid);
 		EbookDomain ebookDomain;
 		EbookView ebookView = null;
 		try {
@@ -50,15 +56,30 @@ public class EbookBusinessControl extends BaseHandleExceptionControl {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-
 			throw e;
-
 		}
 
 		return JSON.toJSONString(ebookView);
 	}
 
-	@RequestMapping(value = "/linkIsFree", produces = "text/html;charset=gbk")
+	@RequestMapping(value = "/recoment", produces = "text/html;charset=utf-8")
+	@ResponseBody 
+	public String recoment(String uid) throws Exception {
+		log.log(Priority.toPriority("FILEOUT"), "uid>>>>>>>" + uid);
+		List<Long> ids = null;
+		try {
+			ids = recommendSerivce
+					.recomentBookIDs(Long.valueOf(uid), "comment");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw e;
+		}
+
+		return JSON.toJSONString(ids);
+	}
+
+	@RequestMapping(value = "/linkIsFree", produces = "text/html;charset=utf-8")
 	@ResponseBody
 	public String geted2kLinkIsFree(String ebid) {
 		try {
@@ -90,7 +111,7 @@ public class EbookBusinessControl extends BaseHandleExceptionControl {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping(value = "/freedownlink", produces = "text/html;charset=gbk")
+	@RequestMapping(value = "/freedownlink", produces = "text/html;charset=utf-8")
 	@ResponseBody
 	public String geted2kLink(String ebid) throws Exception {
 		log.info("获取下载链接+ebid>>>>>>>" + ebid);
@@ -112,7 +133,7 @@ public class EbookBusinessControl extends BaseHandleExceptionControl {
 
 	}
 
-	@RequestMapping(value = "/chargedownlink", produces = "text/html;charset=gbk")
+	@RequestMapping(value = "/chargedownlink", produces = "text/html;charset=utf-8")
 	@ResponseBody
 	public String geted2kLink(String ebid, String buycode, String email)
 			throws Exception {
@@ -148,7 +169,7 @@ public class EbookBusinessControl extends BaseHandleExceptionControl {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping(value = "/getimgurl", produces = "text/html;charset=gbk")
+	@RequestMapping(value = "/getimgurl", produces = "text/html;charset=utf-8")
 	@ResponseBody
 	public String getimg(String ebid) throws Exception {
 

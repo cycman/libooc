@@ -28,6 +28,7 @@ public class IpHibernateImp extends BaseHibernateDAOImp<IpDomain> {
 		if( ! (date.getDay()==domain.getDate().getDay()))
 		{
 			domain.setDownTimes(0);
+			domain.setDate(date);
 			update(domain);
 		}
 		

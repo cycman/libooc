@@ -3,13 +3,15 @@
  * Copyright (c) 2004-2015 All Rights Reserved/
  */
 package com.cyc.lucene;
+
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.queryParser.MultiFieldQueryParser;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
 import org.apache.lucene.util.Version;
 
@@ -18,6 +20,8 @@ import com.cyc.config.ConfigManage;
 import java.io.IOException;
 import java.text.BreakIterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 查询工具类
@@ -27,259 +31,90 @@ import java.util.List;
  */
 public class SearchUtil extends BaseUtil {
 
-    /**
-     * 创建索引
-     */
-//    public static void creatIndex() {
-//
-//        try {
-//            //  循环添加书
-//            for (int i = 1; i <= 5; ++i) {
-//
-//                BookDO bookDO = new BookDO();
-//                bookDO.setId(i);
-//                bookDO.setAuthor("zhangsan" + i);
-//                bookDO.setName("Java program" + i);
-//                bookDO.setContent("Java是一种可以撰写跨平台应用程序的面向对象的程序设计开发语言");
-//                addDoc(bookDO);
-//            }
-//
-//            for (int i = 6; i <= 10; ++i) {
-//                BookDO bookDO = new BookDO();
-//                bookDO.setId(i);
-//                bookDO.setAuthor("lisi" + i);
-//                bookDO.setName("Java program" + i);
-//                bookDO.setContent(
-//                    "Java 技术具有卓越的通用性、高效性、平台移植性和安全性，广泛应用于PC、数据中心、游戏控制台、科学超级计算机、移动电话和互联网");
-//                addDoc(bookDO);
-//            }
-//
-//            for (int i = 11; i <= 15; ++i) {
-//                BookDO bookDO = new BookDO();
-//                bookDO.setId(i);
-//                bookDO.setAuthor("wangwu" + i);
-//                bookDO.setName("Java program" + i);
-//                bookDO.setContent("同时拥有全球最大的开发者专业社");
-//                addDoc(bookDO);
-//            }
-//
-//            for (int i = 16; i <= 20; ++i) {
-//
-//                BookDO bookDO = new BookDO();
-//                bookDO.setId(i);
-//                bookDO.setAuthor("xiaoming" + i);
-//                bookDO.setName("C++ program" + i);
-//                bookDO.setContent("C++是在C语言的基础上开发的一种面向对象编程语言");
-//                addDoc(bookDO);
-//            }
-//        } catch (Exception e) {
-//            logger.equals("索引创建失败:" + e.getMessage());
-//        }
-//    }
+	/**
+	 * 多条搜索
+	 * 
+	 * @param fields
+	 * @param value
+	 * @throws Exception
+	 */
+	public static void multiFieldQuery(String[] fields, String value,
+			List<Document> docs) throws Exception {
+		try {
 
-    /**
-     * 模拟数据库添加，同时添加索引
-     *
-     * @param bookDO
-     * @throws IOException
-     */
-//    private static void addDoc(BookDO bookDO) throws Exception {
-//
-//        try {
-//
-//            // 数据库操作
-//            dataBase.put(bookDO.getId() + "", bookDO);
-//            // 索引操作
-//            Document document = BookConvertor.convert2Doc(bookDO);
-//            IndexWriter indexWriter = getIndexWriter();
-//            indexWriter.addDocument(document);
-//            // 必须提交否则不奏效
-//            indexWriter.commit();
-//
-//        } catch (Exception e) {
-//            logger.error("addDoc异常");
-//            throw e;
-//        }
-//
-//    }
+			// 创建search
+			IndexSearcher searcher = getIndexSearcher();
 
-    /**
-     * 精确查找
-     *
-     */
-    public static void termQuery(String ketword) throws Exception {
-        try {
+			QueryParser queryParser = new MultiFieldQueryParser(
+					Version.LUCENE_35, fields, new StandardAnalyzer(
+							Version.LUCENE_35));
 
-            // 创建search
-            IndexSearcher searcher = getIndexSearcher();
+			queryParser.setDefaultOperator(QueryParser.AND_OPERATOR);
+			Query query = queryParser.parse(value);
 
-            TermQuery query = new TermQuery(new Term("id", ketword));
+			// 查询
 
-            // 查询
-            TopDocs topDocs = searcher.search(query, MAX);
+			TopDocs topDocs = searcher.search(query, 1000);
 
-            ScoreDoc[] scoreDocs = topDocs.scoreDocs;
-            logger.info("查询到条数=" + scoreDocs.length);
+			ScoreDoc[] scoreDocs = topDocs.scoreDocs;
+			logger.info("查询到条数=" + scoreDocs.length);
 
-            for (ScoreDoc scoreDoc : scoreDocs) {
-                Document doc = searcher.doc(scoreDoc.doc);
-                logger.info("doc信息：" + " docId=" + scoreDoc.doc + " id=" + doc.get("id") + " author="
-                            + doc.get("author") + " name=" + doc.get("name") + " content="
-                            + doc.get("content"));
-            }
-        } catch (Exception e) {
-            logger.error("termQuery查询失败");
-            throw e;
-        }
-    }
+			for (ScoreDoc scoreDoc : scoreDocs) {
+				Document doc = searcher.doc(scoreDoc.doc);
+				// logger.info("doc信息：" + " docId=" + scoreDoc.doc + " id=" +
+				// doc.get("id") + " author="
+				// + doc.get("author") + " name=" + doc.get("name") +
+				// " content="
+				// + doc.get("content"));
+				docs.add(doc);
+			}
+		} catch (Exception e) {
+			logger.error("termQuery查询失败");
+			throw e;
+		}
+	}
 
-    /**
-     * 区间检索
-     *
-     */
-    public static void queryByTermRange(String field,String start,String end, boolean includeLStart, boolean includeLEnd) throws Exception {
-        try {
+	/**
+	 * 多条搜索
+	 * 
+	 * @param fields
+	 * @param value
+	 * @throws Exception
+	 */
+	public static void queryParser(String field, String value) throws Exception {
+		try {
 
-            // 创建search
-            IndexSearcher searcher = getIndexSearcher();
+			// 创建search
+			IndexSearcher searcher = getIndexSearcher();
 
+			QueryParser queryParser = new QueryParser(Version.LUCENE_35, field,
+					new StandardAnalyzer(Version.LUCENE_35));
 
-            TermRangeQuery query = new TermRangeQuery(field, start, end, includeLStart, includeLEnd);
+			queryParser.setDefaultOperator(QueryParser.AND_OPERATOR);
+			Query query = queryParser.parse(value);
 
-            // 查询
-            TopDocs topDocs = searcher.search(query, MAX);
+			// 查询
+			TopDocs topDocs = searcher.search(query, 100);
 
-            ScoreDoc[] scoreDocs = topDocs.scoreDocs;
-            logger.info("查询到条数=" + scoreDocs.length);
+			ScoreDoc[] scoreDocs = topDocs.scoreDocs;
+			logger.info("查询到条数=" + scoreDocs.length);
 
-            for (ScoreDoc scoreDoc : scoreDocs) {
-                Document doc = searcher.doc(scoreDoc.doc);
-                logger.info("doc信息：" + " docId=" + scoreDoc.doc + " id=" + doc.get("id") + " author="
-                        + doc.get("author") + " name=" + doc.get("name") + " content="
-                        + doc.get("content"));
-            }
-        } catch (Exception e) {
-            logger.error("termQuery查询失败");
-            throw e;
-        }
-    }
-
-    /**
-     * 模糊搜索
-     *
-     * @param field
-     * @param value
-     * @param minimumSimilarity
-     * @throws Exception
-     */
-    public static void fuzzyQuery(String field, String value, float minimumSimilarity) throws Exception {
-        try {
-
-
-            // 创建search
-            IndexSearcher searcher = getIndexSearcher();
-
-
-            FuzzyQuery query = new FuzzyQuery(new Term(field, value), minimumSimilarity);
-            // 查询
-            TopDocs topDocs = searcher.search(query, MAX);
-
-            ScoreDoc[] scoreDocs = topDocs.scoreDocs;
-            logger.info("查询到条数=" + scoreDocs.length);
-
-            for (ScoreDoc scoreDoc : scoreDocs) {
-                Document doc = searcher.doc(scoreDoc.doc);
-                logger.info("doc信息：" + " docId=" + scoreDoc.doc + " id=" + doc.get("id") + " author="
-                        + doc.get("author") + " name=" + doc.get("name") + " title="
-                        + doc.get("title"));
-            }
-        } catch (Exception e) {
-            logger.error("termQuery查询失败");
-            throw e;
-        }
-    }
-
-    /**
-     * 多条搜索
-     * @param fields
-     * @param value
-     * @throws Exception
-     */
-    public static void multiFieldQuery( String[] fields, String value,List<Document>docs) throws Exception {
-        try {
-
-        	
-            // 创建search
-            IndexSearcher searcher = getIndexSearcher();
-
-
-            QueryParser queryParser = new MultiFieldQueryParser(Version.LUCENE_35, fields,
-                    new StandardAnalyzer(Version.LUCENE_35));
-
-            queryParser.setDefaultOperator(QueryParser.AND_OPERATOR);
-            Query query = queryParser.parse(value);
-
-            // 查询
-            
-            TopDocs topDocs = searcher.search(query, 1000);
-
-            ScoreDoc[] scoreDocs = topDocs.scoreDocs;
-            logger.info("查询到条数=" + scoreDocs.length);
-
-            for (ScoreDoc scoreDoc : scoreDocs) {
-                Document doc = searcher.doc(scoreDoc.doc);
-//                logger.info("doc信息：" + " docId=" + scoreDoc.doc + " id=" + doc.get("id") + " author="
-//                        + doc.get("author") + " name=" + doc.get("name") + " content="
-//                        + doc.get("content"));
-                docs.add(doc);
-            }
-        } catch (Exception e) {
-            logger.error("termQuery查询失败");
-            throw e;
-        }
-    }
-
-
-
-    /**
-     * 多条搜索
-     * @param fields
-     * @param value
-     * @throws Exception
-     */
-    public static void queryParser(String field, String value) throws Exception {
-        try {
-
-
-            // 创建search
-            IndexSearcher searcher = getIndexSearcher();
-
-
-            QueryParser queryParser = new QueryParser(Version.LUCENE_35, field, new StandardAnalyzer(Version.LUCENE_35));
-
-            queryParser.setDefaultOperator(QueryParser.AND_OPERATOR);
-            Query query = queryParser.parse(value);
-
-            // 查询
-            TopDocs topDocs = searcher.search(query, 100);
-
-            ScoreDoc[] scoreDocs = topDocs.scoreDocs;
-            logger.info("查询到条数=" + scoreDocs.length);
-
-            for (ScoreDoc scoreDoc : scoreDocs) {
-                Document doc = searcher.doc(scoreDoc.doc);
-                logger.info("doc信息：" + " docId=" + scoreDoc.doc + " id=" + doc.get("id") + " author="
-                        + doc.get("author") + " name=" + doc.get("name") + " content="
-                        + doc.get("content"));
-            }
-        } catch (Exception e) {
-            logger.error("termQuery查询失败");
-            throw e;
-        }
-    }
+			for (ScoreDoc scoreDoc : scoreDocs) {
+				Document doc = searcher.doc(scoreDoc.doc);
+				logger.info("doc信息：" + " docId=" + scoreDoc.doc + " id="
+						+ doc.get("id") + " author=" + doc.get("author")
+						+ " name=" + doc.get("name") + " content="
+						+ doc.get("content"));
+			}
+		} catch (Exception e) {
+			logger.error("termQuery查询失败");
+			throw e;
+		}
+	}
 
 	/**
 	 * 重载原先的方法使用了分页。默认搜索的结果都为1000条为上线
+	 * 
 	 * @param fileds
 	 * @param search
 	 * @param docs
@@ -288,49 +123,75 @@ public class SearchUtil extends BaseUtil {
 	 * @throws Exception
 	 * @return 返回查询到的记录数
 	 */
-    private static String MAX_INDEX_NUM="maxindex";
+	private static String MAX_INDEX_NUM = "maxindex";
+	private static String[] indexColumns = { "title", "author", "isbn",
+			"topic", "publisher" };
+
 	public static int multiFieldQuery(String[] fileds, String search,
 			List<Document> docs, String page, String pagesize) throws Exception {
-        try {
+		try {
+			if (fileds == null) {
+				fileds = indexColumns;
+			}
+			for (String field : fileds) {
+				if (field.equals("default")) {
+					fileds = indexColumns;
+					break;
+				}
+			}
+			// 创建search
+			IndexSearcher searcher = getIndexSearcher();
 
-        	
-            // 创建search
-            IndexSearcher searcher = getIndexSearcher();
+			QueryParser queryParser = new MultiFieldQueryParser(
+					Version.LUCENE_35, fileds, new StandardAnalyzer(
+							Version.LUCENE_35));
 
+			queryParser.setDefaultOperator(QueryParser.OR_OPERATOR);
+			Query query = queryParser.parse(transformSolrMetacharactor(search));
+			// 查询
+			TopDocs topDocs = searcher.search(query, Integer
+					.valueOf(ConfigManage.GLOBAL_STRING_CONFIG
+							.get(MAX_INDEX_NUM)));
 
-            QueryParser queryParser = new MultiFieldQueryParser(Version.LUCENE_35, fileds,
-                    new StandardAnalyzer(Version.LUCENE_35));
+			ScoreDoc[] scoreDocs = topDocs.scoreDocs;
+			logger.info("查询到条数=" + scoreDocs.length);
 
-            queryParser.setDefaultOperator(QueryParser.OR_OPERATOR);
-            Query query = queryParser.parse(search);
+			int temp = 0;
+			for (ScoreDoc scoreDoc : scoreDocs) {
+				if (temp < (Integer.valueOf(page) * Integer.valueOf(pagesize))
+						&& temp >= ((Integer.valueOf(page) - 1) * Integer
+								.valueOf(pagesize))) {
+					Document doc = searcher.doc(scoreDoc.doc);
+					docs.add(doc);
+				}
+				temp++;
+				if (temp > (Integer.valueOf(page) * Integer.valueOf(pagesize)))
+					break;
+			}
+			return scoreDocs.length;
+		} catch (Exception e) {
+			logger.error("termQuery查询失败");
+			throw e;
+		}// TODO Auto-generated method stub
 
-            // 查询
-            
-            TopDocs topDocs = searcher.search(query, Integer.valueOf(ConfigManage.GLOBAL_STRING_CONFIG.get(MAX_INDEX_NUM)));
-
-            ScoreDoc[] scoreDocs = topDocs.scoreDocs;
-            logger.info("查询到条数=" + scoreDocs.length);
-
-            int temp=0;
-            for (ScoreDoc scoreDoc : scoreDocs) {
-            	if(temp<(Integer.valueOf(page)*Integer.valueOf(pagesize))&&
-            			temp>=((Integer.valueOf(page)-1)*Integer.valueOf(pagesize))){
-                Document doc = searcher.doc(scoreDoc.doc);
-//                logger.info("doc信息：" + " docId=" + scoreDoc.doc + " id=" + doc.get("id") + " author="
-//                        + doc.get("author") + " name=" + doc.get("name") + " content="
-//                        + doc.get("content"));
-                 docs.add(doc);
-            	}
-            	temp++;
-            	if(temp>(Integer.valueOf(page)*Integer.valueOf(pagesize)))
-            			break;
-            }
-            return scoreDocs.length;
-        } catch (Exception e) {
-            logger.error("termQuery查询失败");
-            throw e;
-        }// TODO Auto-generated method stub
-		
 	}
 
+	  /**
+     * 转义Solr/Lucene的保留运算字符
+     * 保留字符有+ - && || ! ( ) { } [ ] ^ ” ~ * ? : \
+     * @param input
+     * @return 转义后的字符串
+     */
+    public static String transformSolrMetacharactor(String input){
+        StringBuffer sb = new StringBuffer();
+        String regex = "[+\\-&|!(){}\\[\\]^\"~*?:(\\)]";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+        while(matcher.find()){
+            matcher.appendReplacement(sb, "\\\\"+matcher.group());
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
+    }
+	
 }

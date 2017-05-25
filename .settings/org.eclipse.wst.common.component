@@ -6,6 +6,6 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
         <wb-resource deploy-path="/WEB-INF/lib" source-path="/src/main/webapp/WEB-INF/lib"/>
         <property name="java-output-path" value="/webSample/target/classes"/>
-        <property name="context-root" value="libooc"/>
+        <property name="context-root" value="ZHDM"/>
     </wb-module>
 </project-modules>

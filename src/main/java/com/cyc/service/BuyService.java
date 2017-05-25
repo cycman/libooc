@@ -26,13 +26,10 @@ public class BuyService {
 					return true;
 				}else if(code.equals(domain.getCode())&&domain.getState_use().equals(BuyPermitDomain.CODE_USEED)&&domain.getEbid().equals(ebid))
 				{
-					return true;
-					
+					return true;		
 				}
 			}
-			
 		}
-		
 		return false;
 	}
 

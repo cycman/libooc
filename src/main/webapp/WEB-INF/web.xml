@@ -37,7 +37,16 @@
         <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
 
     </listener>-->
-
+<!-- 设置origin alow 为*的监听 -->
+<filter>
+    <filter-name>origin</filter-name>
+    <filter-class>com.cyc.filter.Originfilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>origin</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+ 
   <!-- 监听ip对下载事件 -->
   <filter>
     <filter-name>ipfilter</filter-name>
@@ -48,17 +57,9 @@
     <url-pattern>/ebook/freedownlink</url-pattern>
   </filter-mapping>
 
-<!-- 设置origin alow 为*的监听 -->
-<filter>
-    <filter-name>origin</filter-name>
-    <filter-class>com.cyc.filter.Originfilter</filter-class>
-  </filter>
-  <filter-mapping>
-    <filter-name>origin</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-  
 
+
+  
   
     <servlet>
         <servlet-name>dispatcherServlet</servlet-name>

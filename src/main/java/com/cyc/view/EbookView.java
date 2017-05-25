@@ -11,9 +11,7 @@ public class EbookView extends BaseView {
 
 	public EbookView(EbookDomain ebookDomain) throws Exception{
 		// TODO Auto-generated constructor stub
-		 
 			this.delegato=new EbookDomianDelegator(ebookDomain);
-		 
 	}
 
 	public EbookDomianDelegator getDelegato() {

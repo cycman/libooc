@@ -23,5 +23,8 @@ public class Originfilter extends OncePerRequestFilter {
 		 response.setHeader("Access-Control-Allow-Origin", "*"); 
 		 filterChain.doFilter(request, response);
 	}
+	
+	
+	
 
 }

@@ -26,7 +26,7 @@ public  class EbookHibernateImp extends BaseHibernateDAOImp<EbookDomain> impleme
 		// TODO Auto-generated method stub
 		Session session=null;
 		try {
-			String hql = "from ebook_t as eb where 1=1";
+			String hql = "from book_base as eb where 1=1";
 			
 			session = getSession();
 			if(params!=null)

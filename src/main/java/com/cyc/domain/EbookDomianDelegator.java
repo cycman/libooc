@@ -143,7 +143,7 @@ public class EbookDomianDelegator {
 				java.text.DecimalFormat   df   =new   java.text.DecimalFormat("#.00");  
 				 
 				this.size=(df.format(Double.valueOf(ebookDomain.getSizeByte())/1024/1024))+"m";
-				this.topic=ebookDomain.getTOPICANDORIGINFILENAME();
+				this.topic=ebookDomain.getTopic();
 				this.year=ebookDomain.getYear();
 				this.volume=ebookDomain.getVolume();
 			} catch (Exception e) {

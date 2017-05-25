@@ -13,21 +13,30 @@ import org.springframework.stereotype.Component;
 
 import com.cyc.config.ConfigManage;
 import com.cyc.exception.MyException;
+import com.cyc.hibernate.domain.BookTopic;
 import com.cyc.hibernate.domain.EbookDomain;
 import com.cyc.hibernate.domain.Ed2kStateDomain;
 import com.cyc.hibernate.imp.EbookHibernateImp;
 import com.cyc.hibernate.imp.Ed2kStateHibernateImp;
+import com.cyc.hibernate.imp.TopicHibernateImp;
 import com.cyc.util.OssClientUtil;
 
 @Component
 public class EbookService {
 
+	
 	@Autowired
 	private EbookHibernateImp ebookHibernateImp;
+	
+	@Autowired
+	private TopicHibernateImp topicHibernateImp;
 
 	@Autowired
 	private Ed2kStateHibernateImp ed2kStateHibernateImp;
 
+	
+	
+	
 	public EbookDomain findbyEid(String ebid) throws Exception {
 		// TODO Auto-generated method stub
 		if (!isNumeric(ebid)) {
@@ -38,8 +47,11 @@ public class EbookService {
 
 		EbookDomain domain = ebookHibernateImp.findByColum(
 				EbookHibernateImp.EBOOK_COLUM_EID, ebid);
-		String ed2k = null;
-
+		BookTopic topic=topicHibernateImp.findByTopicId(domain.getTopic());
+		if(topic!=null)
+		{
+			domain.setTopic(topic.getTopicDescr());
+		}
 		return domain;
 	}
 

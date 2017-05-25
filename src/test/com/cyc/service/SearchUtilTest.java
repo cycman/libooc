@@ -26,52 +26,7 @@ import junit.framework.TestCase;
 public class SearchUtilTest  {
 
    
-    /**
-     * 测试精确查找
-     */
- 
-    public void testTermqQuery() {
-
-        try {
-
-            SearchUtil.termQuery("java");
-
-        } catch (Exception e) {
-      // assertTrue(e.getMessage(), false);
-        }
-    }
-
-    /**
-     * 测试区间查找
-     */
-    
-     public void testTermqRangeQuery() {
-
-        try {
-
-            SearchUtil.queryByTermRange("author", "a", "lisi7", true, true);
-
-        } catch (Exception e) {
-            assertTrue(e.getMessage(), false);
-        }
-    }
-
-    /**
-     * 测试模糊查找
-     */
-     @Test
-    public void testfuzzyQuery() {
-
-        try {
-            //IndexUtil.numDocs();
-
-            SearchUtil.fuzzyQuery("title", "Human", 0.1f);
-
-        } catch (Exception e) {
-            assertTrue(e.getMessage(), false);
-        }
-    }
-
+  
 
 	/**
 	 * 测试多条件查询

@@ -6,6 +6,7 @@ package com.cyc.lucene;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -28,134 +29,110 @@ import java.util.Properties;
  */
 public class BaseUtil {
 
-    protected static final int MAX    = 200;
-    protected static Logger    logger = Logger.getLogger(IndexUtil.class);
+	protected static final int MAX = 200;
+	protected static Logger logger = Logger.getLogger(IndexUtil.class);
 
-    /** 索引读 */
-    private static IndexReader indexReader;
+	/** 索引读 */
+	private static IndexReader indexReader;
 
-    /** 索引写 */
-    private static IndexWriter indexWriter;
+	/** 索引写 */
+	private static IndexWriter indexWriter;
 
-    /** 检索 */
-    private static IndexSearcher indexSearcher;
+	/** 检索 */
+	private static IndexSearcher indexSearcher;
 
-    /** 目录 */
-    private static Directory directory;
+	/** 目录 */
+	private static Directory directory;
 
-    /** 模拟数据库 */
-    protected static Map<String, Object> dataBase = new HashMap<String, Object>();
+	/** 模拟数据库 */
+	protected static Map<String, Object> dataBase = new HashMap<String, Object>();
 
-    // 初始化
-    static {
+	// 初始化
+	static {
 
-        try {
-            Properties properties = new Properties();
-            properties
-                .load(IndexUtil.class.getClassLoader().getResourceAsStream("lucence.properties"));
+		try {
+			Properties properties = new Properties();
+			properties.load(IndexUtil.class.getClassLoader()
+					.getResourceAsStream("lucence.properties"));
 
-            // 1. 初始化Directory
-            directory = FSDirectory.open(new File((String) properties.get("path")));
+			// 1. 初始化Directory
+			directory = FSDirectory.open(new File((String) properties
+					.get("path")));
 
-            // 指定一段代码，会在JVM退出之前执行。
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-                public void run() {
-                    try {
-                        if (null != indexWriter) {
-                            indexWriter.close();
-                        }
-                        if (null != indexSearcher) {
-                            indexSearcher.close();
-                        }
+			// 指定一段代码，会在JVM退出之前执行。
+			Runtime.getRuntime().addShutdownHook(new Thread() {
+				public void run() {
+					try {
+						if (null != indexWriter) {
+							indexWriter.close();
+						}
 
-                        if (null != indexReader) {
-                            indexReader.close();
-                        }
-                        if (null != directory) {
-                            directory.close();
-                        }
-                        if (null != dataBase) {
-                            dataBase.clear();
-                        }
+						if (null != indexReader) {
+							indexReader.close();
+						}
+						if (null != directory) {
+							directory.close();
+						}
+						if (null != dataBase) {
+							dataBase.clear();
+						}
 
-                        logger.info("=== 已经关闭  ===");
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
+						logger.info("=== 已经关闭  ===");
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}
+			});
 
-        } catch (Exception e) {
-            logger.info("初始化错误:" + e.getMessage());
-        }
-    }
+		} catch (Exception e) {
+			logger.info("初始化错误:" + e.getMessage());
+		}
+	}
 
-    /**
-     * 获取reader
-     *
-     * @return
-     * @throws IOException
-     */
-    protected static IndexReader getIndexReader() throws IOException {
+	/**
+	 * 获取writer
+	 *
+	 * @return
+	 * @throws IOException
+	 */
+	protected static IndexWriter getIndexWriter() throws IOException {
 
-        if (null != indexReader) {
+		if (null != indexWriter) {
+			return indexWriter;
+		} else {
+			// 防止并发
+			synchronized (IndexUtil.class) {
+				// 初始化writer
+				IndexWriterConfig config = new IndexWriterConfig(
+						Version.LUCENE_35, new StandardAnalyzer(
+								Version.LUCENE_35));
 
-            IndexReader newIr = IndexReader.openIfChanged(indexReader);
-            if (null != newIr) {
-                indexReader.close();
-                indexReader = newIr;
-                indexSearcher = new IndexSearcher(indexReader);
-            }
-            return indexReader;
+				// 每次都重新创建
+				config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+				indexWriter = new IndexWriter(directory, config);
+			}
+			return indexWriter;
+		}
+	}
 
-        } else {
+	/**
+	 * 获取Searcher
+	 *
+	 * @return
+	 * @throws IOException
+	 */
+	protected static IndexSearcher getIndexSearcher() throws IOException {
 
-            return IndexReader.open(directory);
-        }
-    }
-
-    /**
-     * 获取writer
-     *
-     * @return
-     * @throws IOException
-     */
-    protected static IndexWriter getIndexWriter() throws IOException {
-
-        if (null != indexWriter) {
-            return indexWriter;
-        } else {
-            // 防止并发
-            synchronized (IndexUtil.class) {
-                //  初始化writer
-                IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_35,
-                    new StandardAnalyzer(Version.LUCENE_35));
-                
-                // 每次都重新创建
-                config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
-                indexWriter = new IndexWriter(directory, config);
-            }
-            return indexWriter;
-        }
-    }
-
-    /**
-     * 获取Searcher
-     *
-     * @return
-     * @throws IOException
-     */
-    protected static IndexSearcher getIndexSearcher() throws IOException {
-
-        if (null != indexSearcher) {
-            return indexSearcher;
-        } else {
-            // 防止并发
-            synchronized (IndexUtil.class) {
-                indexSearcher = new IndexSearcher(getIndexReader());
-            }
-            return indexSearcher;
-        }
-    }
+		if (null != indexSearcher) {
+			return indexSearcher;
+		} else {
+			// 防止并发
+			synchronized (IndexUtil.class) {
+				DirectoryReader ireader = DirectoryReader.open(directory);
+				indexSearcher = new IndexSearcher(ireader);
+			}
+			return indexSearcher;
+		}
+	}
 
 }

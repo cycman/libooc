@@ -3,9 +3,6 @@ package com.yyp.mvc.controller;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.impl.Log4JLogger;
-import org.apache.commons.logging.impl.SimpleLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,9 +10,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
 import com.cyc.domain.EbookIndex;
-import com.cyc.hibernate.core.BaseHibernateDAOImp;
-import com.cyc.hibernate.domain.EbookDomain;
-import com.cyc.hibernate.imp.EbookHibernateImp;
 import com.cyc.service.IndexSearchSer;
 import com.cyc.view.SearchPageView;
 
@@ -31,7 +25,8 @@ public class IndexSeacherCtl extends BaseHandleExceptionControl {
 
 	// 创建controllog
 	private Logger log = Logger.getLogger(this.getClass().getName());
-	private IndexSearchSer seacher = new IndexSearchSer();
+	@Autowired
+	private IndexSearchSer seacher ;
 
 	@RequestMapping(value = "/default", produces = "text/html;charset=utf-8")
 	@ResponseBody
@@ -58,18 +53,22 @@ public class IndexSeacherCtl extends BaseHandleExceptionControl {
 		return JSON.toJSONString(view);
 	}
 	
-	
 	@RequestMapping(value = "/FiledsSearch", produces = "text/html;charset=utf-8")
 	@ResponseBody
-	public String FiledsSearch(String fileds,String search, String page, String pagesize)
+	public String FiledsSearch(String fileds,String search, String page, String pagesize,String uid)
 			throws Exception {
 		log.info("FiledsSearch" + "::::>" + "searchfor::::>" + search + "::::>"
 				+ page + "::::>" + pagesize);
 
 		SearchPageView view = new SearchPageView();
-		List<EbookIndex> indexs = seacher.IndexSearchDIV(fileds.split(","),search, page,
+		List<EbookIndex> indexs =null;
+		if(uid==null||"0".equals(uid))
+			indexs = seacher.IndexSearchDIV(fileds.split(","),search, page,
 				pagesize);
-
+		else {
+			indexs = seacher.IndexSearchDIVDuid(fileds.split(","),search, page,
+					pagesize,Long.valueOf(uid));
+		}
 		view.setIndexs(indexs);
 		view.setPage(page);
 		view.setPagesize(pagesize);
@@ -85,6 +84,11 @@ public class IndexSeacherCtl extends BaseHandleExceptionControl {
 		
 		
 	}
+	
+	
+	
+ 	
+	
 	
 	
 

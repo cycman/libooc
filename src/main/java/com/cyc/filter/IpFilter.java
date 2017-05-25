@@ -9,8 +9,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.hibernate.annotations.Check;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.cyc.config.ConfigManage;
@@ -40,8 +38,8 @@ public class IpFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 		} else {
 			response.getOutputStream()
-					.write("一天不能下载太多了哦~把资源让给其他有用的人"
-							.getBytes("gbk"));
+					.write("you can't down too much in one day".getBytes()
+							);
 		}
 
 	}

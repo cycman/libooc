@@ -311,6 +311,6 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		<finalName>ZHDM</finalName>
+		<finalName>libooc</finalName>
 	</build>
 </project>

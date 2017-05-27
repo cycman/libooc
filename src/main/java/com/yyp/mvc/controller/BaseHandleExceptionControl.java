@@ -1,5 +1,7 @@
 package com.yyp.mvc.controller;
 
+import java.util.logging.Logger;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpRequest;
@@ -15,7 +17,8 @@ public class BaseHandleExceptionControl {
 	
 	 
 	
-	
+	private Logger log = Logger.getLogger(this.getClass().getName());
+
 	@ExceptionHandler 
 	@ResponseBody
     public String exp(HttpServletRequest request, Exception ex) {  
@@ -23,7 +26,7 @@ public class BaseHandleExceptionControl {
         	
 			ex.printStackTrace();
 			//生成errorview
-        
+			log.info(ex.getMessage());
             return JSON.toJSONString(new ErrorView(ex));  
 	}
 }

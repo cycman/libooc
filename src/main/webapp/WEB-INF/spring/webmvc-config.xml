@@ -1,43 +1,56 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:websocket="http://www.springframework.org/schema/websocket"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd                                   http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket.xsd"
-       default-autowire="byName">
-    <!-- 添加注解驱动 -->
-    <mvc:annotation-driven>
-    </mvc:annotation-driven>
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:websocket="http://www.springframework.org/schema/websocket"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd                                   http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket.xsd"
+	default-autowire="byName">
+	<!-- 添加注解驱动 -->
+	<bean id="myThreadPool"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="5" /><!--最小线程数 -->
+		<property name="maxPoolSize" value="10" /><!--最大线程数 -->
+		<property name="queueCapacity" value="50" /><!--缓冲队列大小 -->
+		<property name="threadNamePrefix" value="abc-" /><!--线程池中产生的线程名字前缀 -->
+		<property name="keepAliveSeconds" value="30" /><!--线程池中空闲线程的存活时间单位秒 -->
+	</bean>
+	<mvc:annotation-driven>
+		<mvc:async-support task-executor="myThreadPool"
+			default-timeout="600">
+			<mvc:callable-interceptors>
+				<bean class="com.jay.springmvc.async.MyCallableInterceptor" />
+			</mvc:callable-interceptors>
+		</mvc:async-support>
+	</mvc:annotation-driven>
 
 	<context:component-scan base-package="com.cyc.config">
-    </context:component-scan>
-    <context:component-scan base-package="com.yyp.mvc.controller">
-    </context:component-scan>
-    
+	</context:component-scan>
+	<context:component-scan base-package="com.yyp.mvc.controller">
+	</context:component-scan>
+
 	<context:component-scan base-package="com.cyc.hibernate">
-    </context:component-scan>
-    <context:component-scan base-package="com.cyc.service">
-    </context:component-scan>
+	</context:component-scan>
+	<context:component-scan base-package="com.cyc.service">
+	</context:component-scan>
 
 
-    <mvc:default-servlet-handler/>
+	<mvc:default-servlet-handler />
 
-    <!-- spring-websocket配置start-->
-      
-    
-    <mvc:resources location="/resources/" mapping="/resources/**" />
-    <mvc:resources location="/WEB-INF/static/" mapping="/static/**" />
+	<!-- spring-websocket配置start -->
 
-    <!-- 定义跳转的文件的前后缀 -->
-    <bean id="viewResolver"
-          class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        <!-- 这里的配置我的理解是自动给后面action的方法return的字符串加上前缀和后缀，变成一个 可用的url地址 -->
-        <property name="prefix" value="/WEB-INF/jsp/" />
-        <property name="suffix" value=".jsp" />
-    </bean>
 
-	
+	<mvc:resources location="/resources/" mapping="/resources/**" />
+	<mvc:resources location="/WEB-INF/static/" mapping="/static/**" />
+
+	<!-- 定义跳转的文件的前后缀 -->
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<!-- 这里的配置我的理解是自动给后面action的方法return的字符串加上前缀和后缀，变成一个 可用的url地址 -->
+		<property name="prefix" value="/WEB-INF/jsp/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+
 
 
 

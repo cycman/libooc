@@ -1,14 +1,27 @@
 package com.yyp.mvc.controller;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
+import java.util.concurrent.Callable;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.async.WebAsyncTask;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSON;
 import com.cyc.config.ConfigManage;
@@ -25,6 +38,7 @@ import com.cyc.util.OssClientUtil;
 import com.cyc.view.EbookView;
 import com.cyc.view.Ed2kLinkView;
 import com.cyc.view.LinkIsFreeView;
+import com.sun.istack.FinalArrayList;
 
 @Controller
 @RequestMapping("/ebook")
@@ -63,7 +77,7 @@ public class EbookControl extends BaseHandleExceptionControl {
 	}
 
 	@RequestMapping(value = "/recoment", produces = "text/html;charset=utf-8")
-	@ResponseBody 
+	@ResponseBody
 	public String recoment(String uid) throws Exception {
 		log.log(Priority.toPriority("FILEOUT"), "uid>>>>>>>" + uid);
 		List<Long> ids = null;
@@ -119,12 +133,7 @@ public class EbookControl extends BaseHandleExceptionControl {
 
 		String downpath = ebookService.findbyEid(ebid).Ed2k();
 		Ed2kStateDomain ed2kStateDomain = ed2kLinkService.storedAndFind(ebid);
-		if (Ed2kStateDomain.UP_SUCCESSED.equals(ed2kStateDomain
-				.getState_upload())) {
-			log.info("书本已经成功上传不为免费书籍");
-			throw new MyException(MyException.ERROR_BUYCODE_USELESS,
-					new Exception(), this.getClass());
-		}
+
 		Ed2kLinkDelegator delegator = new Ed2kLinkDelegator(ed2kStateDomain,
 				downpath, true);
 		Ed2kLinkView elinkView = new Ed2kLinkView(delegator);
@@ -180,6 +189,92 @@ public class EbookControl extends BaseHandleExceptionControl {
 	private boolean CheckCode(String buycode, String ebid) {
 		// TODO Auto-generated method stub
 		return buyService.CodeIsUseful(buycode, ebid);
+	}
+
+	@RequestMapping("download")
+	public ResponseEntity<byte[]> download() throws IOException {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+		headers.setContentDispositionFormData("attachment", "dict.txt");
+		return new ResponseEntity<byte[]>(
+				FileUtils.readFileToByteArray(new File("d://out.pdf")),
+				headers, HttpStatus.CREATED);
+	}
+
+	@RequestMapping("download3")
+	public void download3(int bid) throws IOException {
+		ebookService.downAndUploadLibgenBook(bid, false);
+	}
+
+	// only for pdf
+	@RequestMapping("preview")
+	public void preview(HttpServletResponse res, int bid,String fileName) throws Exception {
+		OutputStream os = res.getOutputStream();
+		try {
+			res.reset();
+			res.setHeader("Content-Disposition",
+					"attachment; filename="+fileName);
+			res.setContentType("application/octet-stream; charset=utf-8");
+			res.setHeader("Access-Control-Allow-Origin", "*");
+			res.setHeader("Access-Control-Expose-Headers", "Accept-Ranges");
+			if (ebookService.bookIsUp(bid)) {
+				res.addHeader("location",
+						ConfigManage.GLOBAL_STRING_CONFIG.get("bookosspath")
+								+ ebookService.findbyEid(bid + "").getURL());
+				res.setStatus(302);
+			} else {
+				ebookService.directWriteOutput(bid, os);
+			}
+			os.flush();
+		} finally {
+			if (os != null) {
+				os.close();
+			}
+		}
+	}
+
+	@RequestMapping(value = "/longtimetask", method = RequestMethod.GET)
+	public WebAsyncTask<String> longTimeTask(final HttpServletResponse res,
+			final int bid, final String fileName) {
+		System.out.println("/longtimetask被调用 thread id is : "
+				+ Thread.currentThread().getId());
+		Callable<String> callable = new Callable<String>() {
+			public String call() throws Exception {
+				OutputStream os = res.getOutputStream();
+				try {
+
+					res.reset();
+					res.setHeader("Content-Disposition",
+							"attachment; filename=" + fileName);
+					res.setContentType("application/octet-stream; charset=utf-8");
+					res.setHeader("Access-Control-Allow-Origin", "*");
+					res.setHeader("Access-Control-Expose-Headers",
+							"Accept-Ranges");
+					if (ebookService.bookIsUp(bid)) {
+						res.addHeader(
+								"location",
+								ConfigManage.GLOBAL_STRING_CONFIG
+										.get("bookosspath")
+										+ ebookService.findbyEid(bid + "")
+												.getURL());
+						res.setStatus(302);
+					} else {
+						ebookService.directWriteOutputAndUpload(bid, os);
+					}
+					os.flush();
+
+				} finally {
+					if (os != null) {
+						os.close();
+					}
+				}
+				System.out.println("执行成功 thread id is : "
+						+ Thread.currentThread().getId());
+				return "success";
+			}
+		};
+
+		return new WebAsyncTask(1000000, callable);
 	}
 
 }

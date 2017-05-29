@@ -217,6 +217,7 @@ public class EbookControl extends BaseHandleExceptionControl {
 			res.setContentType("application/octet-stream; charset=utf-8");
 			res.setHeader("Access-Control-Allow-Origin", "*");
 			res.setHeader("Access-Control-Expose-Headers", "Accept-Ranges");
+			res.setHeader("Access-Control-Expose-Headers", "Content-Length");
 			if (ebookService.bookIsUp(bid)) {
 				res.addHeader("location",
 						ConfigManage.GLOBAL_STRING_CONFIG.get("bookosspath")
@@ -248,6 +249,7 @@ public class EbookControl extends BaseHandleExceptionControl {
 							"attachment; filename=" + fileName);
 					res.setContentType("application/octet-stream; charset=utf-8");
 					res.setHeader("Access-Control-Allow-Origin", "*");
+					res.setHeader("Access-Control-Expose-Headers", "Content-Length");
 					res.setHeader("Access-Control-Expose-Headers",
 							"Accept-Ranges");
 					if (ebookService.bookIsUp(bid)) {

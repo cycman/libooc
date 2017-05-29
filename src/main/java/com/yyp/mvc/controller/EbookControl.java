@@ -223,7 +223,7 @@ public class EbookControl extends BaseHandleExceptionControl {
 								+ ebookService.findbyEid(bid + "").getURL());
 				res.setStatus(302);
 			} else {
-				ebookService.directWriteOutput(bid, os);
+				ebookService.directWriteOutput(bid, os,res);
 			}
 			os.flush();
 		} finally {
@@ -233,8 +233,8 @@ public class EbookControl extends BaseHandleExceptionControl {
 		}
 	}
 
-	@RequestMapping(value = "/longtimetask", method = RequestMethod.GET)
-	public WebAsyncTask<String> longTimeTask(final HttpServletResponse res,
+	@RequestMapping(value = "/preview2", method = RequestMethod.GET)
+	public WebAsyncTask<String> preview2(final HttpServletResponse res,
 			final int bid, final String fileName) {
 		System.out.println("/longtimetask被调用 thread id is : "
 				+ Thread.currentThread().getId());
@@ -259,7 +259,7 @@ public class EbookControl extends BaseHandleExceptionControl {
 												.getURL());
 						res.setStatus(302);
 					} else {
-						ebookService.directWriteOutputAndUpload(bid, os);
+						ebookService.directWriteOutputAndUpload(bid, os,res);
 					}
 					os.flush();
 

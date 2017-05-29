@@ -8,6 +8,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.http.HttpConnection;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -262,9 +264,9 @@ public class EbookService {
 		return uploadImg(ebid);
 	}
 	
-	public OutputStream directWriteOutput(int bid ,OutputStream outputStream) throws Exception{
+	public OutputStream directWriteOutput(int bid ,OutputStream outputStream,HttpServletResponse res) throws Exception{
 		EbookDomain domain= ebookHibernateImp.findByColum("eb_ID", bid);
-		
+		res.setHeader("Content-Length", domain.getSizeByte());
 		if(domain!=null)
 		{
 			return HttpClientDownLoad.directWriteOutputAndUpload(domain, outputStream);
@@ -273,9 +275,10 @@ public class EbookService {
 		return outputStream;
 	}
 	
-	public OutputStream directWriteOutputAndUpload(int bid ,OutputStream outputStream) throws Exception{
+	public OutputStream directWriteOutputAndUpload(int bid ,OutputStream outputStream,HttpServletResponse res) throws Exception{
 		EbookDomain domain= ebookHibernateImp.findByColum("eb_ID", bid);
-		
+		res.setHeader("Content-Length", domain.getSizeByte());
+
 		if(domain!=null)
 		{
 			return HttpClientDownLoad.directWriteOutputAndUpload(domain, outputStream);

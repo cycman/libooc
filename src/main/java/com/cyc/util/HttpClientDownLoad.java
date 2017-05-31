@@ -210,12 +210,12 @@ public class HttpClientDownLoad {
 		if (domain == null) {
 			return outputStream;
 		}
- 		String md5 = domain.getMD5();
+		String md5 = domain.getMD5();
 		String host = ConfigManage.GLOBAL_STRING_CONFIG.get("libHost");
 		String url = host + "ads.php?md5=" + md5;
- 		CloseableHttpResponse second = null;
+		CloseableHttpResponse second = null;
 		if (!OssClientUtil.fileIsUp("hanzhou", "liboocbooks", domain.getURL())) {
- 			CloseableHttpResponse response = HttpClientDownLoad.get(url);
+			CloseableHttpResponse response = HttpClientDownLoad.get(url);
 			String resourceUrl = regrexFromContent(response);
 			System.out.println(resourceUrl);
 			response.close();
@@ -231,12 +231,12 @@ public class HttpClientDownLoad {
 		InputStream inputStream = second.getEntity().getContent();
 		byte[] date = new byte[1024];
 		int len = 0;
-  
+
 		while ((len = inputStream.read(date)) != -1) {
 			outputStream.write(date, 0, len);
-			 
+
 		}
-		 
+
 		second.close();
 		return outputStream;
 	}
@@ -268,22 +268,24 @@ public class HttpClientDownLoad {
 		}
 		second = HttpClientDownLoad.get(url);
 		InputStream inputStream = second.getEntity().getContent();
-		byte[] date = new byte[1024*1024];
+		byte[] date = new byte[1024 * 1024];
 		int len = 0;
 		File outfile = new File(md5 + "." + extension);
 		FileOutputStream fileOutputStream = new FileOutputStream(outfile);
 
 		while ((len = inputStream.read(date)) != -1) {
 			outputStream.write(date, 0, len);
-			if (!isup){
+			if (!isup) {
 				fileOutputStream.write(date, 0, len);
 				fileOutputStream.flush();
 			}
 		}
 		if (!isup) {
 			fileOutputStream.close();
-			OssClientUtil.UploadFile("hanzhou", "liboocbooks", outfile,
-					domain.getURL());
+			if (outfile.length() == Long.valueOf(domain.getSizeByte())) {
+				OssClientUtil.UploadFile("hanzhou", "liboocbooks", outfile,
+						domain.getURL());
+			}
 			outfile.delete();
 		}
 		second.close();
